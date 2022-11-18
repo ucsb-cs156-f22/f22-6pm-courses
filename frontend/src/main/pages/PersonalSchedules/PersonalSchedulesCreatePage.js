@@ -17,7 +17,7 @@ export default function PersonalSchedulesCreatePage() {
   });
 
   const onSuccess = (personalSchedule) => {
-    toast(`New personalSchedule Created - id: ${personalSchedule.id} name: ${((personalSchedule.name.length > 15) ? personalSchedule.name.substring(0, 15) : personalSchedule.name)}`);
+    toast(`New personalSchedule Created - id: ${personalSchedule.id} name: ${personalSchedule.name}`);
   }
 
   const mutation = useBackendMutation(
