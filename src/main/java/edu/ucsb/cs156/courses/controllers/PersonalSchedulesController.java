@@ -90,8 +90,9 @@ public class PersonalSchedulesController extends ApiController {
 
         PersonalSchedule personalschedule = new PersonalSchedule();
         personalschedule.setUser(currentUser.getUser());
-        if (name.length() > 15) {
-          name = name.substring(0, 15);
+        int maxLength = 15;
+        if (name.length() > maxLength) {
+          name = name.substring(0, maxLength);
         }
         personalschedule.setName(name);
         personalschedule.setDescription(description);
