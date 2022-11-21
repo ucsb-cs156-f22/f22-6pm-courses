@@ -290,6 +290,49 @@ public class PersonalSchedulesControllerTests extends ControllerTestCase {
         assertEquals(expectedJson, responseString);
     }
 
+    @WithMockUser(roles = { "ADMIN", "USER" })
+    @Test
+    public void api_schedules__admin_logged_in__cannot_post_schedule_name_with_more_than_fifteen_characters() throws Exception {
+
+        // act
+        MvcResult response = mockMvc.perform(
+                post("/api/personalschedules/post?name=Test Name is longer than 15 characters&description=Test Description&quarter=20222")
+                        .with(csrf()))
+                .andExpect(status().isNotFound()).andReturn();
+
+        // assert
+        Map<String, Object> json = responseToJson(response);
+        assertEquals("IllegalArgumentException", json.get("type"));
+        assertEquals("PersonalSchedule name must be no more than 15 characters", json.get("message"));
+
+    }
+
+    @WithMockUser(roles = { "ADMIN", "USER" })
+    @Test
+    public void api_schedules__admin_logged_in__post_schedule_name_with_exactly_fifteen_characters() throws Exception {
+
+        // arrange
+
+        User thisUser = currentUserService.getCurrentUser().getUser();
+
+        PersonalSchedule expectedSchedule = PersonalSchedule.builder().name("These are tests").description("Test Description").quarter("20222").user(thisUser).id(0L).build();
+
+        when(personalscheduleRepository.save(eq(expectedSchedule))).thenReturn(expectedSchedule);
+
+        // act
+        MvcResult response = mockMvc.perform(
+                post("/api/personalschedules/post?name=These are tests&description=Test Description&quarter=20222")
+                        .with(csrf()))
+                .andExpect(status().isOk()).andReturn();
+
+        // assert
+        verify(personalscheduleRepository, times(1)).save(expectedSchedule);
+        String expectedJson = mapper.writeValueAsString(expectedSchedule);
+        String responseString = response.getResponse().getContentAsString();
+        assertEquals(expectedJson, responseString);
+
+    }
+
     @WithMockUser(roles = { "USER" })
     @Test
     public void api_schedules_post__user_logged_in__cannot_post_duplicate_schedule() throws Exception {
@@ -609,72 +652,98 @@ public class PersonalSchedulesControllerTests extends ControllerTestCase {
 
     @WithMockUser(roles = { "ADMIN", "USER" })
     @Test
-    public void api_schedules__admin_logged_in__name_is_less_than_fifteen_characters() throws Exception {
-        // arrange
+    public void api_schedules__admin_logged_in__cannot_put_schedule_name_with_more_than_fifteen_characters() throws Exception {
+        User u = User.builder().id(366L).build();
+        PersonalSchedule ps = PersonalSchedule.builder().name("1234567890123456").description("Test Description").quarter("20222").user(u).id(37L).build();
+        
+        when(personalscheduleRepository.findById(eq(37L))).thenReturn(Optional.of(ps));
 
-        User thisUser = currentUserService.getCurrentUser().getUser();
-
-        PersonalSchedule expectedSchedule = PersonalSchedule.builder().name("Test").description("Test Description").quarter("20222").user(thisUser).id(0L).build();
-
-        when(personalscheduleRepository.save(eq(expectedSchedule))).thenReturn(expectedSchedule);
+        String requestBody = mapper.writeValueAsString(ps);
 
         // act
         MvcResult response = mockMvc.perform(
-                post("/api/personalschedules/post?name=Test&description=Test Description&quarter=20222")
+                put("/api/personalschedules/admin?id=37")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .characterEncoding("utf-8")
+                        .content(requestBody)
+                        .with(csrf()))
+                .andExpect(status().isNotFound()).andReturn();
+
+        // assert
+        verify(personalscheduleRepository, times(1)).findById(37L);
+        Map<String, Object> json = responseToJson(response);
+        assertEquals("IllegalArgumentException", json.get("type"));
+        assertEquals("PersonalSchedule name must be no more than 15 characters", json.get("message"));
+    }
+
+    @WithMockUser(roles = { "USER" })
+    @Test
+    public void api_schedules__user_logged_in__put_schedule_name_with_exactly_fifteen_characters() throws Exception {
+        // arrange
+
+        User u = currentUserService.getCurrentUser().getUser();
+        User otherUser = User.builder().id(999).build();
+        PersonalSchedule ps1 = PersonalSchedule.builder().name("These are tests").description("Description 1").quarter("20221").user(u).id(67L).build();
+        // We deliberately set the user information to another user
+        // This should get ignored and overwritten with current user when todo is saved
+
+        PersonalSchedule updatedSchedule = PersonalSchedule.builder().name("123456789012345").description("Description 2").quarter("20222").user(otherUser).id(67L).build();
+        PersonalSchedule correctSchedule = PersonalSchedule.builder().name("123456789012345").description("Description 2").quarter("20222").user(u).id(67L).build();
+
+        String requestBody = mapper.writeValueAsString(updatedSchedule);
+        String expectedReturn = mapper.writeValueAsString(correctSchedule);
+
+        when(personalscheduleRepository.findByIdAndUser(eq(67L), eq(u))).thenReturn(Optional.of(ps1));
+
+        // act
+        MvcResult response = mockMvc.perform(
+                put("/api/personalschedules?id=67")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .characterEncoding("utf-8")
+                        .content(requestBody)
                         .with(csrf()))
                 .andExpect(status().isOk()).andReturn();
 
         // assert
-        verify(personalscheduleRepository, times(1)).save(expectedSchedule);
-        String expectedJson = mapper.writeValueAsString(expectedSchedule);
+        verify(personalscheduleRepository, times(1)).findByIdAndUser(67L, u);
+        verify(personalscheduleRepository, times(1)).save(correctSchedule); // should be saved with correct user
         String responseString = response.getResponse().getContentAsString();
-        assertEquals(expectedJson, responseString);
+        assertEquals(expectedReturn, responseString);
+        
     }
 
     @WithMockUser(roles = { "ADMIN", "USER" })
     @Test
-    public void api_schedules__admin_logged_in__name_is_fifteen_characters() throws Exception {
+    public void api_schedules__admin_logged_in__put_schedule_name_with_exactly_fifteen_characters() throws Exception {
         // arrange
 
-        User thisUser = currentUserService.getCurrentUser().getUser();
+        User otherUser = User.builder().id(255L).build();
+        PersonalSchedule ps1 = PersonalSchedule.builder().name("These are Tests").description("Description 1").quarter("20221").user(otherUser).id(77L).build();
+        User yetAnotherUser = User.builder().id(512L).build();
+        // We deliberately put the wrong user on the updated schedule
+        // We expect the controller to ignore this and keep the user the same
+        PersonalSchedule updatedSchedule = PersonalSchedule.builder().name("123456789012345").description("Description 2").quarter("20222").user(yetAnotherUser).id(77L)
+                .build();
+        PersonalSchedule correctSchedule = PersonalSchedule.builder().name("123456789012345").description("Description 2").quarter("20222").user(otherUser).id(77L)
+                .build();
 
-        PersonalSchedule expectedSchedule = PersonalSchedule.builder().name("123456789012345").description("Test Description").quarter("20222").user(thisUser).id(0L).build();
+        String requestBody = mapper.writeValueAsString(updatedSchedule);
+        String expectedJson = mapper.writeValueAsString(correctSchedule);
 
-        when(personalscheduleRepository.save(eq(expectedSchedule))).thenReturn(expectedSchedule);
+        when(personalscheduleRepository.findById(eq(77L))).thenReturn(Optional.of(ps1));
 
         // act
         MvcResult response = mockMvc.perform(
-                post("/api/personalschedules/post?name=123456789012345&description=Test Description&quarter=20222")
+                put("/api/personalschedules/admin?id=77")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .characterEncoding("utf-8")
+                        .content(requestBody)
                         .with(csrf()))
                 .andExpect(status().isOk()).andReturn();
 
         // assert
-        verify(personalscheduleRepository, times(1)).save(expectedSchedule);
-        String expectedJson = mapper.writeValueAsString(expectedSchedule);
-        String responseString = response.getResponse().getContentAsString();
-        assertEquals(expectedJson, responseString);
-    }
-
-    @WithMockUser(roles = { "ADMIN", "USER" })
-    @Test
-    public void api_schedules__admin_logged_in__name_is_greater_than_fifteen_characters() throws Exception {
-        // arrange
-
-        User thisUser = currentUserService.getCurrentUser().getUser();
-
-        PersonalSchedule expectedSchedule = PersonalSchedule.builder().name("This Name is gr").description("Test Description").quarter("20222").user(thisUser).id(0L).build();
-
-        when(personalscheduleRepository.save(eq(expectedSchedule))).thenReturn(expectedSchedule);
-
-        // act
-        MvcResult response = mockMvc.perform(
-                post("/api/personalschedules/post?name=This Name is greater than fifteen characters&description=Test Description&quarter=20222")
-                        .with(csrf()))
-                .andExpect(status().isOk()).andReturn();
-
-        // assert
-        verify(personalscheduleRepository, times(1)).save(expectedSchedule);
-        String expectedJson = mapper.writeValueAsString(expectedSchedule);
+        verify(personalscheduleRepository, times(1)).findById(77L);
+        verify(personalscheduleRepository, times(1)).save(correctSchedule);
         String responseString = response.getResponse().getContentAsString();
         assertEquals(expectedJson, responseString);
     }

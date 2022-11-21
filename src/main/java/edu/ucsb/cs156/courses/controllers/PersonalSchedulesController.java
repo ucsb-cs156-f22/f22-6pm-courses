@@ -38,6 +38,8 @@ public class PersonalSchedulesController extends ApiController {
     @Autowired
     PersonalScheduleRepository personalscheduleRepository;
 
+    static final int MAX_NAME_LENGTH = 15;
+
     @ApiOperation(value = "List all personal schedules")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     @GetMapping("/admin/all")
@@ -91,12 +93,10 @@ public class PersonalSchedulesController extends ApiController {
         personalscheduleRepository.findByNameAndQuarter(name, quarter)
         .ifPresent(PersonalSchedule -> { throw new IllegalArgumentException(String.format("PersonalSchedule for %s in %s already exists", name, quarter)); });
 
+        if (name.length() > MAX_NAME_LENGTH) { throw new IllegalArgumentException(String.format("PersonalSchedule name must be no more than 15 characters"));}
+
         PersonalSchedule personalschedule = new PersonalSchedule();
         personalschedule.setUser(currentUser.getUser());
-        int maxLength = 15;
-        if (name.length() > maxLength) {
-          name = name.substring(0, maxLength);
-        }
         personalschedule.setName(name);
         personalschedule.setDescription(description);
         personalschedule.setQuarter(quarter);
@@ -145,6 +145,8 @@ public class PersonalSchedulesController extends ApiController {
         personalscheduleRepository.findByNameAndQuarter(incomingSchedule.getName(), incomingSchedule.getQuarter())
         .ifPresent(PersonalSchedule -> { throw new IllegalArgumentException(String.format("PersonalSchedule for %s in %s already exists", incomingSchedule.getName(), incomingSchedule.getQuarter())); });
 
+        if (incomingSchedule.getName().length() > MAX_NAME_LENGTH) { throw new IllegalArgumentException(String.format("PersonalSchedule name must be no more than 15 characters"));}
+
         personalschedule.setName(incomingSchedule.getName());
         personalschedule.setDescription(incomingSchedule.getDescription());
         personalschedule.setQuarter(incomingSchedule.getQuarter());
@@ -166,6 +168,8 @@ public class PersonalSchedulesController extends ApiController {
         personalscheduleRepository.findByNameAndQuarter(incomingSchedule.getName(), incomingSchedule.getQuarter())
         .ifPresent(PersonalSchedule -> { throw new IllegalArgumentException(String.format("PersonalSchedule for %s in %s already exists", incomingSchedule.getName(), incomingSchedule.getQuarter())); });
 
+        if (incomingSchedule.getName().length() > MAX_NAME_LENGTH) { throw new IllegalArgumentException(String.format("PersonalSchedule name must be no more than 15 characters"));}
+        
         personalschedule.setName(incomingSchedule.getName());
         personalschedule.setDescription(incomingSchedule.getDescription());
         personalschedule.setQuarter(incomingSchedule.getQuarter());
