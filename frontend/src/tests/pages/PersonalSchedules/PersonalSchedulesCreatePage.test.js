@@ -104,5 +104,4 @@ describe("PersonalSchedulesCreatePage tests", () => {
         expect(mockNavigate).toBeCalledWith({ "to": "/personalschedules/list" });
     });
 
-
 });
