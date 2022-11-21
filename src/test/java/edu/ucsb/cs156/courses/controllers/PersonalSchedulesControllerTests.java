@@ -292,6 +292,28 @@ public class PersonalSchedulesControllerTests extends ControllerTestCase {
 
     @WithMockUser(roles = { "USER" })
     @Test
+    public void api_schedules_post__user_logged_in__cannot_post_duplicate_schedule() throws Exception {
+        // arrange
+
+        User thisUser = currentUserService.getCurrentUser().getUser();
+        PersonalSchedule ps = PersonalSchedule.builder().name("Test Name").description("Test Description").quarter("20222").user(thisUser).id(0L).build();
+        when(personalscheduleRepository.findByNameAndQuarter(eq("Test Name"), eq("20222"))).thenReturn(Optional.of(ps));
+
+        // act
+        MvcResult response = mockMvc.perform(
+                post("/api/personalschedules/post?name=Test Name&description=Test Description&quarter=20222")
+                        .with(csrf()))
+                .andExpect(status().isNotFound()).andReturn();
+
+        // assert
+        verify(personalscheduleRepository, times(1)).findByNameAndQuarter(eq("Test Name"), eq("20222"));
+        Map<String, Object> json = responseToJson(response);
+        assertEquals("IllegalArgumentException", json.get("type"));
+        assertEquals("PersonalSchedule for Test Name in 20222 already exists", json.get("message"));
+    }
+
+    @WithMockUser(roles = { "USER" })
+    @Test
     public void api_schedules__user_logged_in__delete_schedule() throws Exception {
         // arrange
 
@@ -490,6 +512,35 @@ public class PersonalSchedulesControllerTests extends ControllerTestCase {
         assertEquals("PersonalSchedule with id 31 not found", json.get("message"));
     }
 
+    @WithMockUser(roles = { "USER" })
+    @Test
+    public void api_schedules__user_logged_in__cannot_put_duplicate_schedule() throws Exception {
+        // arrange
+
+        User u = currentUserService.getCurrentUser().getUser();
+        PersonalSchedule ps = PersonalSchedule.builder().name("Test Name").description("Test Description").quarter("20222").user(u).id(31L).build();
+        
+        when(personalscheduleRepository.findByIdAndUser(eq(31L), eq(u))).thenReturn(Optional.of(ps));
+        when(personalscheduleRepository.findByNameAndQuarter(eq("Test Name"), eq("20222"))).thenReturn(Optional.of(ps));
+
+        String requestBody = mapper.writeValueAsString(ps);
+
+        // act
+        MvcResult response = mockMvc.perform(
+                put("/api/personalschedules?id=31")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .characterEncoding("utf-8")
+                        .content(requestBody)
+                        .with(csrf()))
+                .andExpect(status().isNotFound()).andReturn();
+
+        // assert
+        verify(personalscheduleRepository, times(1)).findByIdAndUser(31L, u);
+        verify(personalscheduleRepository, times(1)).findByNameAndQuarter(eq("Test Name"), eq("20222"));
+        Map<String, Object> json = responseToJson(response);
+        assertEquals("IllegalArgumentException", json.get("type"));
+        assertEquals("PersonalSchedule for Test Name in 20222 already exists", json.get("message"));
+    }
 
     @WithMockUser(roles = { "ADMIN", "USER" })
     @Test
@@ -554,6 +605,36 @@ public class PersonalSchedulesControllerTests extends ControllerTestCase {
         Map<String, Object> json = responseToJson(response);
         assertEquals("EntityNotFoundException", json.get("type"));
         assertEquals("PersonalSchedule with id 77 not found", json.get("message"));
+    }
+
+    @WithMockUser(roles = { "ADMIN", "USER" })
+    @Test
+    public void api_schedules__admin_logged_in__cannot_put_duplicate_schedule() throws Exception {
+        // arrange
+
+        User u = User.builder().id(366L).build();
+        PersonalSchedule ps = PersonalSchedule.builder().name("Test Name").description("Test Description").quarter("20222").user(u).id(37L).build();
+        
+        when(personalscheduleRepository.findById(eq(37L))).thenReturn(Optional.of(ps));
+        when(personalscheduleRepository.findByNameAndQuarter(eq("Test Name"), eq("20222"))).thenReturn(Optional.of(ps));
+
+        String requestBody = mapper.writeValueAsString(ps);
+
+        // act
+        MvcResult response = mockMvc.perform(
+                put("/api/personalschedules/admin?id=37")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .characterEncoding("utf-8")
+                        .content(requestBody)
+                        .with(csrf()))
+                .andExpect(status().isNotFound()).andReturn();
+
+        // assert
+        verify(personalscheduleRepository, times(1)).findById(37L);
+        verify(personalscheduleRepository, times(1)).findByNameAndQuarter(eq("Test Name"), eq("20222"));
+        Map<String, Object> json = responseToJson(response);
+        assertEquals("IllegalArgumentException", json.get("type"));
+        assertEquals("PersonalSchedule for Test Name in 20222 already exists", json.get("message"));
     }
 
 }
