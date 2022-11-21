@@ -650,6 +650,34 @@ public class PersonalSchedulesControllerTests extends ControllerTestCase {
         assertEquals("PersonalSchedule with id 77 not found", json.get("message"));
     }
 
+    @WithMockUser(roles = { "USER" })
+    @Test
+    public void api_schedules__user_logged_in__cannot_put_schedule_name_with_more_than_fifteen_characters() throws Exception {
+        // arrange
+
+        User u = currentUserService.getCurrentUser().getUser();
+        PersonalSchedule ps = PersonalSchedule.builder().name("1234567890123456").description("Test Description").quarter("20222").user(u).id(31L).build();
+        
+        when(personalscheduleRepository.findByIdAndUser(eq(31L), eq(u))).thenReturn(Optional.of(ps));
+
+        String requestBody = mapper.writeValueAsString(ps);
+
+        // act
+        MvcResult response = mockMvc.perform(
+                put("/api/personalschedules?id=31")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .characterEncoding("utf-8")
+                        .content(requestBody)
+                        .with(csrf()))
+                .andExpect(status().isNotFound()).andReturn();
+
+        // assert
+        verify(personalscheduleRepository, times(1)).findByIdAndUser(31L, u);
+        Map<String, Object> json = responseToJson(response);
+        assertEquals("IllegalArgumentException", json.get("type"));
+        assertEquals("PersonalSchedule name must be no more than 15 characters", json.get("message"));
+    }
+
     @WithMockUser(roles = { "ADMIN", "USER" })
     @Test
     public void api_schedules__admin_logged_in__cannot_put_schedule_name_with_more_than_fifteen_characters() throws Exception {
