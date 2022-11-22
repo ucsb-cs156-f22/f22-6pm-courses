@@ -23,7 +23,7 @@ describe("Footer tests", () => {
         );
         expect(screen.getByTestId("footer-source-code-link")).toHaveAttribute(
           "href",
-          "https://github.com/ucsb-cs156-s22/s22-4pm-courses"
+          "https://github.com/ucsb-cs156/proj-courses"
         );
 
         expect(screen.getByTestId("footer-sticker-link")).toHaveAttribute(
