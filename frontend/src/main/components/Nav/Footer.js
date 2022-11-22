@@ -30,7 +30,7 @@ export default function Footer() {
       {space}
       <a
         data-testid="footer-source-code-link"
-        href={systemInfo?.sourceRepo}
+        href={systemInfo.sourceRepo}
         target="_blank"
         rel="noopener noreferrer"
       >
