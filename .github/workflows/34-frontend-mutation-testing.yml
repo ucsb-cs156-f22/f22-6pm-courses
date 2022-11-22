@@ -11,7 +11,7 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-    timeout-minutes: 60
+    timeout-minutes: 120
 
     strategy:
       matrix:
@@ -28,3 +28,9 @@ jobs:
         working-directory: ./frontend
       - run: npx stryker run
         working-directory: ./frontend
+      - name: Upload stryker report to Artifacts
+        if: always() # always upload artifacts, even if tests fail
+        uses: actions/upload-artifact@v2
+        with:
+          name: stryker-report
+          path: frontend/reports/mutation/html/*
