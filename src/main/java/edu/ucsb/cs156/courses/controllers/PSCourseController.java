@@ -137,12 +137,10 @@ public class PSCourseController extends ApiController {
             String section = node.path("section").asText();
             if (section.endsWith("00")) {
                 enrollCdPrimary = node.path("enrollCode").asText();
-                if (hasSecondary) {
-                    break;
-                }
             }
             else {
                 hasSecondary = true;
+                break;
             }
         }
 
@@ -151,26 +149,28 @@ public class PSCourseController extends ApiController {
             hasSecondary = false;
         }
 
-        if (enrollCdPrimary == enrollCd && hasSecondary) {
+        if (enrollCdPrimary.equals(enrollCd) && hasSecondary) {
             throw new IllegalArgumentException(enrollCd + " is for a course with sections; please add a specific section and the lecture will be automatically added");
         }
 
         ArrayList<PSCourse> savedCourses = new ArrayList<>();
 
-        PSCourse secondary = new PSCourse();
-        secondary.setUser(currentUser.getUser());
-        secondary.setEnrollCd(enrollCd);
-        secondary.setPsId(psId);
-        PSCourse saved = coursesRepository.save(secondary);
-        savedCourses.add(saved);
-
         PSCourse primary = new PSCourse();
         primary.setUser(currentUser.getUser());
         primary.setEnrollCd(enrollCdPrimary);
         primary.setPsId(psId);
-        saved = coursesRepository.save(primary);
+        PSCourse saved = coursesRepository.save(primary);
         savedCourses.add(saved);
-        
+
+        if (hasSecondary) {
+            PSCourse secondary = new PSCourse();
+            secondary.setUser(currentUser.getUser());
+            secondary.setEnrollCd(enrollCd);
+            secondary.setPsId(psId);
+            saved = coursesRepository.save(secondary);
+            savedCourses.add(saved);
+        }
+
         return savedCourses;
     }
 
