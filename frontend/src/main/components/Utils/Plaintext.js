@@ -10,6 +10,7 @@ export default function Plaintext({ text }) {
   const [firstLine, ...rest] = textToRender.split('\n')
   return (
     <pre data-testid="plaintext">
+      // Stryker disable next-line StringLiteral : key value is internal to React and not exposed to tests
       <span key={"0"}>{firstLine}</span>
       {
         // Stryker disable next-line ArithmeticOperator : key value is internal to React and not exposed to tests
