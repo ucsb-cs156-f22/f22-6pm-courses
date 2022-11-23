@@ -38,8 +38,8 @@ describe("SinglePersonalScheduleDropdown tests", () => {
   test("renders without crashing on one personal schedule", () => {
     render(
       <SinglePersonalScheduleDropdown
-        personalSchedules={personalSchedulesFixtures}
-        personalSchedule={personalSchedulesFixtures}
+        personalSchedules={personalSchedulesFixtures.onePersonalSchedule}
+        personalSchedule={personalSchedulesFixtures.onePersonalSchedule}
         setPersonalSchedule={setPersonalSchedule}
         controlId="spsd1"
       />
