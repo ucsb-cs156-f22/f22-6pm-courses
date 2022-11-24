@@ -20,6 +20,8 @@ import SectionSearchesIndexPage from "main/pages/SectionSearches/SectionSearches
 import CoursesIndexPage from "main/pages/Courses/PSCourseIndexPage";
 import CoursesCreatePage from "main/pages/Courses/PSCourseCreatePage";
 
+import CourseSearchesIndexPage from "main/pages/CourseSearches/CourseSearchesIndexPage";
+
 function App() {
 
   const { data: currentUser } = useCurrentUser();
@@ -53,6 +55,7 @@ function App() {
           )
         }
         <Route exact path="/sectionsearches/search" element={<SectionSearchesIndexPage />} />
+        <Route exact path="/coursesearches/search" element={<CourseSearchesIndexPage />} />
       </Routes>
     </BrowserRouter>
   );
