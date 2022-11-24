@@ -5,6 +5,12 @@ const personalSchedulesFixtures = {
         "description": "TestDescription",
         "quarter": "W08"
     },
+    onePersonalScheduleArr: [{
+        "id": 1,
+        "name": "TestName",
+        "description": "TestDescription",
+        "quarter": "W08"
+    }],
     twoPersonalSchedules: [
         {
             "id": 1,
