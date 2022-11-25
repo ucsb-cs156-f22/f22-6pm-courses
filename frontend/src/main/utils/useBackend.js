@@ -49,12 +49,16 @@ export function useBackend(queryKey, axiosParameters, initialData) {
 const reportAxiosError = (error) => {
     console.error("Axios Error:", error);
     toast(`Axios Error: ${error}`);
-    return null;
+
+    // toast(`Axios Error: ${error.response.data.message}`);
+    
+    return error;
 };
 
 const wrappedParams = async (params) => {
     try {
-        return await (await axios(params)).data;
+        const response = await axios(params);
+        return response.data;
     } catch (rejectedValue) {
         reportAxiosError(rejectedValue);
         throw rejectedValue;

@@ -4,6 +4,7 @@ import edu.ucsb.cs156.courses.errors.EntityNotFoundException;
 import edu.ucsb.cs156.courses.errors.BadEnrollCdException;
 import net.bytebuddy.implementation.bytecode.Throw;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import edu.ucsb.cs156.courses.models.CurrentUser;
 import edu.ucsb.cs156.courses.services.CurrentUserService;
@@ -29,6 +30,9 @@ public abstract class ApiController {
 
   @ExceptionHandler({ EntityNotFoundException.class, BadEnrollCdException.class, IllegalArgumentException.class })
   @ResponseStatus(HttpStatus.NOT_FOUND)
+  @ResponseBody
+  // @ResponseStatus(HttpStatus.BAD_REQUEST)
+
   public Object handleGenericException(Throwable e) {
     return Map.of(
       "type", e.getClass().getSimpleName(),

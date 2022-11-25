@@ -85,6 +85,8 @@ describe("utils/useBackend tests", () => {
             expect(mockToast).toHaveBeenCalledTimes(2);
             expect(mockToast).toHaveBeenCalledWith("Axios Error: Error: Request failed with status code 404");
             expect(mockToast).toHaveBeenCalledWith("Error: Request failed with status code 404");
+            // expect(mockToast).toHaveBeenCalledWith("Axios Error: Error: PersonalSchedule for ABC in 20222 already exists");
+            
 
             expect(console.error).toHaveBeenCalledTimes(3);
             const errorMessage0 = console.error.mock.calls[0][0];

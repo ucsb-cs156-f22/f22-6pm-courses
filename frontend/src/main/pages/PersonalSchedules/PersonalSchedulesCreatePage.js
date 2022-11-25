@@ -6,55 +6,62 @@ import { toast } from "react-toastify";
 
 export default function PersonalSchedulesCreatePage() {
 
-  const objectToAxiosParams = (personalSchedule) => ({
-    url: "/api/personalschedules/post",
-    method: "POST",
-    params: {
-      name: personalSchedule.name,
-      description: personalSchedule.description,
-      quarter: personalSchedule.quarter
+    const objectToAxiosParams = (personalSchedule) => ({
+        url: "/api/personalschedules/post",
+        method: "POST",
+        params: {
+            name: personalSchedule.name,
+            description: personalSchedule.description,
+            quarter: personalSchedule.quarter
+        }
+    });
+
+    const onSuccess = (personalSchedule) => {
+        toast(`New personalSchedule Created - id: ${personalSchedule.id} name: ${personalSchedule.name}`);
     }
-  });
 
-  const onSuccess = (personalSchedule) => {
-    toast(`New personalSchedule Created - id: ${personalSchedule.id} name: ${personalSchedule.name}`);
-  }
+    const onError = (error) => {
+        // alert('Error: ' + error);
+        // alert(error.response.data.message)
+        toast(`Axios Error: ${error.response.data.message}`);
 
-  const onError = (error) => {
-    toast(`Error: ${error}`);
-  }
+        // toast(`PersonalSchedule for ABC in 20222 already exists`);
 
-  const mutation = useBackendMutation(
-    objectToAxiosParams,
-     { onSuccess, onError  },
-     // Stryker disable next-line all : hard to set up test for caching
-     ["/api/personalschedules/all"]
-     );
+    // console.error("Axios Error:", error.response.data.message);
 
-  const { isSuccess } = mutation
+      }
+    
+      const mutation = useBackendMutation(
+        objectToAxiosParams,
+     { onSuccess, onError  }, 
+         // Stryker disable next-line all : hard to set up test for caching
+         ["/api/personalschedules/all"]
+         );
 
-  const onSubmit = async (data) => {
-    const quarter = {
-      quarter: localStorage["PersonalScheduleForm-quarter"]
+    const { isSuccess } = mutation
+
+    const onSubmit = async (data) => {
+        const quarter = {
+            quarter: localStorage["PersonalScheduleForm-quarter"]
+        }
+        console.log(quarter)
+        const dataFinal = Object.assign(data, quarter)
+        console.log(dataFinal)
+        mutation.mutate(dataFinal);
     }
-    console.log(quarter)
-    const dataFinal = Object.assign(data, quarter)
-    console.log(dataFinal)
-    mutation.mutate(dataFinal);
-  }
 
-  if (isSuccess) {
-    return <Navigate to="/personalschedules/list" />
-  }
+    if (isSuccess) {
+        return <Navigate to="/personalschedules/list" />
+    }
 
-  return (
-    <BasicLayout>
-      <div className="pt-2">
-        <h1>Create New PersonalSchedule</h1>
+    return (
+        <BasicLayout>
+            <div className="pt-2">
+                <h1>Create New PersonalSchedule</h1>
 
-        <PersonalScheduleForm submitAction={onSubmit} />
+                <PersonalScheduleForm submitAction={onSubmit} />
 
-      </div>
-    </BasicLayout>
-  )
+            </div>
+        </BasicLayout>
+    )
 }
