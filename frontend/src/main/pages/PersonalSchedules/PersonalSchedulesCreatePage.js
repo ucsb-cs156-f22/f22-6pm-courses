@@ -21,7 +21,8 @@ export default function PersonalSchedulesCreatePage() {
   }
 
   const onError = (error) => {
-    toast(`Error: ${error}`);
+    // toast(`Error: ${error}`);
+    toast(`Axios Error: ${error.response.data.message}`);
   }
 
   const mutation = useBackendMutation(
