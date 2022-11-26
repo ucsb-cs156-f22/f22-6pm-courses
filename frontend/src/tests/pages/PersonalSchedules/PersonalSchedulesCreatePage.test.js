@@ -159,8 +159,7 @@ describe("PersonalSchedulesCreatePage tests", () => {
                 "quarter": "20124"
             });
 
-        expect(mockToast).toBeCalledWith("PersonalSchedule for ABC in W08 already exists");//
-        expect(mockNavigate).toBeCalledWith({ "to": "/personalschedules/create" });
+        expect(mockToast).toBeCalledWith("Axios Error: Error: Request failed with status code 404");//
     });
 
 });
