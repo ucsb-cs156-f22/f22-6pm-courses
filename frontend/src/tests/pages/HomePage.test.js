@@ -6,7 +6,7 @@ import AxiosMockAdapter from "axios-mock-adapter";
 import userEvent from "@testing-library/user-event";
 
 import HomePage from "main/pages/HomePage";
-import { coursesFixtures } from "fixtures/courseFixtures";
+import { oneSection } from "fixtures/sectionFixtures";
 import { apiCurrentUserFixtures } from "fixtures/currentUserFixtures";
 import { allTheSubjects } from "fixtures/subjectFixtures";
 import { systemInfoFixtures } from "fixtures/systemInfoFixtures";
@@ -21,13 +21,8 @@ jest.mock("react-toastify", () => {
   };
 });
 
-describe("HomePage tests", () => {
+describe("Home Page tests", () => {
   const axiosMock = new AxiosMockAdapter(axios);
-
-  beforeEach(() => {
-    jest.spyOn(console, 'error')
-    console.error.mockImplementation(() => null);
-  });
 
   beforeEach(() => {
     axiosMock.resetHistory();
@@ -50,11 +45,11 @@ describe("HomePage tests", () => {
     );
   });
 
-  test("calls UCSB Curriculum api correctly with 1 course response", async () => {
+  test("calls UCSB section search api correctly with 1 section response", async () => {
     axiosMock.onGet("/api/UCSBSubjects/all").reply(200, allTheSubjects);
     axiosMock
-      .onGet("/api/public/basicsearch")
-      .reply(200, { classes: coursesFixtures.oneCourse });
+      .onGet("/api/sections/basicsearch")
+      .reply(200, oneSection);
 
     render(
       <QueryClientProvider client={queryClient}>
@@ -65,7 +60,7 @@ describe("HomePage tests", () => {
     );
 
     const selectQuarter = screen.getByLabelText("Quarter");
-    userEvent.selectOptions(selectQuarter, "20211");
+    userEvent.selectOptions(selectQuarter, "20222");
     const selectSubject = screen.getByLabelText("Subject Area");
 
     expect(await screen.findByLabelText("Subject Area")).toHaveTextContent("ANTH");
@@ -85,11 +80,11 @@ describe("HomePage tests", () => {
     });
 
     expect(axiosMock.history.get[0].params).toEqual({
-      qtr: "20211",
+      qtr: "20222",
       dept: "ANTH",
       level: "G",
     });
 
-    expect(screen.getByText("CMPSC")).toBeInTheDocument();
+    expect(screen.getByText("ECE 1A")).toBeInTheDocument();
   });
 });
