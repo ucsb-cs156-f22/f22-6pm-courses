@@ -49,7 +49,6 @@ export function useBackend(queryKey, axiosParameters, initialData) {
 const reportAxiosError = (error) => {
     console.error("Axios Error:", error);
     toast(`Axios Error: ${error}`);
-    // toast(`Axios Error: ${error.response.data.message}`);
     return null;
 };
 
