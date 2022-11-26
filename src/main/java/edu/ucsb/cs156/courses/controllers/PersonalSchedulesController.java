@@ -38,6 +38,8 @@ public class PersonalSchedulesController extends ApiController {
     @Autowired
     PersonalScheduleRepository personalscheduleRepository;
 
+    static final int MAX_NAME_LENGTH = 15;
+
     @ApiOperation(value = "List all personal schedules")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     @GetMapping("/admin/all")
@@ -88,6 +90,11 @@ public class PersonalSchedulesController extends ApiController {
         CurrentUser currentUser = getCurrentUser();
         log.info("currentUser={}", currentUser);
 
+        personalscheduleRepository.findByNameAndQuarter(name, quarter)
+        .ifPresent(PersonalSchedule -> { throw new IllegalArgumentException(String.format("PersonalSchedule for %s in %s already exists", name, quarter)); });
+
+        if (name.length() > MAX_NAME_LENGTH) { throw new IllegalArgumentException(String.format("PersonalSchedule name must be no more than 15 characters"));}
+
         PersonalSchedule personalschedule = new PersonalSchedule();
         personalschedule.setUser(currentUser.getUser());
         personalschedule.setName(name);
@@ -134,6 +141,11 @@ public class PersonalSchedulesController extends ApiController {
         User currentUser = getCurrentUser().getUser();
         PersonalSchedule personalschedule = personalscheduleRepository.findByIdAndUser(id, currentUser)
           .orElseThrow(() -> new EntityNotFoundException(PersonalSchedule.class, id));
+        
+        personalscheduleRepository.findByNameAndQuarter(incomingSchedule.getName(), incomingSchedule.getQuarter())
+        .ifPresent(PersonalSchedule -> { throw new IllegalArgumentException(String.format("PersonalSchedule for %s in %s already exists", incomingSchedule.getName(), incomingSchedule.getQuarter())); });
+
+        if (incomingSchedule.getName().length() > MAX_NAME_LENGTH) { throw new IllegalArgumentException(String.format("PersonalSchedule name must be no more than 15 characters"));}
 
         personalschedule.setName(incomingSchedule.getName());
         personalschedule.setDescription(incomingSchedule.getDescription());
@@ -152,7 +164,12 @@ public class PersonalSchedulesController extends ApiController {
             @RequestBody @Valid PersonalSchedule incomingSchedule) {
               PersonalSchedule personalschedule = personalscheduleRepository.findById(id)
           .orElseThrow(() -> new EntityNotFoundException(PersonalSchedule.class, id));
+        
+        personalscheduleRepository.findByNameAndQuarter(incomingSchedule.getName(), incomingSchedule.getQuarter())
+        .ifPresent(PersonalSchedule -> { throw new IllegalArgumentException(String.format("PersonalSchedule for %s in %s already exists", incomingSchedule.getName(), incomingSchedule.getQuarter())); });
 
+        if (incomingSchedule.getName().length() > MAX_NAME_LENGTH) { throw new IllegalArgumentException(String.format("PersonalSchedule name must be no more than 15 characters"));}
+        
         personalschedule.setName(incomingSchedule.getName());
         personalschedule.setDescription(incomingSchedule.getDescription());
         personalschedule.setQuarter(incomingSchedule.getQuarter());
