@@ -2,9 +2,9 @@ import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { QueryClient, QueryClientProvider } from "react-query";
 import { MemoryRouter } from "react-router-dom";
 
-import PersonalSectionsTable from "main/components/PersonalSchedules/PersonalSectionsTable";
+import PersonalSectionsTable from "main/components/PersonalSections/PersonalSectionsTable";
 import { currentUserFixtures } from "fixtures/currentUserFixtures";
-import { personalSectionsFixtures } from "fixtures/personalSectionsFixtures";
+import { personalSectionsFixtures } from "fixtures/personalSectionFixtures";
 
 const mockedNavigate = jest.fn();
 
