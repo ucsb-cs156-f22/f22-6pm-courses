@@ -1,10 +1,10 @@
-import { fireEvent, render, screen, waitFor } from "@testing-library/react";
+import {  _fireEvent, render, screen } from "@testing-library/react";
+import { currentUserFixtures } from "fixtures/currentUserFixtures";
+import { personalSectionsFixtures } from "fixtures/personalSectionsFixtures";
 import { QueryClient, QueryClientProvider } from "react-query";
 import { MemoryRouter } from "react-router-dom";
-
 import PersonalSectionsTable from "main/components/PersonalSections/PersonalSectionsTable";
-import { currentUserFixtures } from "fixtures/currentUserFixtures";
-import { personalSectionsFixtures } from "fixtures/personalSectionFixtures";
+
 
 const mockedNavigate = jest.fn();
 
@@ -13,14 +13,7 @@ jest.mock('react-router-dom', () => ({
     useNavigate: () => mockedNavigate
 }));
 
-const mockedMutate = jest.fn();
-
-jest.mock('main/utils/useBackend', () => ({
-    ...jest.requireActual('main/utils/useBackend'),
-    useBackendMutation: () => ({mutate: mockedMutate})
-}));
-
-describe("UserTable tests", () => {
+describe("PersonalSections tests", () => {
   const queryClient = new QueryClient();
 
   test("renders without crashing for empty table with user not logged in", () => {
@@ -32,6 +25,7 @@ describe("UserTable tests", () => {
           <PersonalSectionsTable personalSections={[]} currentUser={currentUser} />
         </MemoryRouter>
       </QueryClientProvider>
+
     );
   });
 
@@ -44,6 +38,7 @@ describe("UserTable tests", () => {
           <PersonalSectionsTable personalSections={[]} currentUser={currentUser} />
         </MemoryRouter>
       </QueryClientProvider>
+
     );
   });
 
@@ -56,25 +51,24 @@ describe("UserTable tests", () => {
           <PersonalSectionsTable personalSections={[]} currentUser={currentUser} />
         </MemoryRouter>
       </QueryClientProvider>
+
     );
   });
 
-  test("Has the expected colum headers and content for Ordinary User", () => {
-
-    const currentUser = currentUserFixtures.userOnly;
-
+  test("Has the expected column headers and content", () => {
     render(
       <QueryClientProvider client={queryClient}>
         <MemoryRouter>
-          <PersonalSectionsTable personalSections={personalSectionsFixtures.threePersonalSections} currentUser={currentUser} />
+          <PersonalSectionsTable personalSections={personalSectionsFixtures.threePersonalSections} />
         </MemoryRouter>
       </QueryClientProvider>
+
     );
 
-    const expectedHeaders = ["Course ID", "Enroll Code","Section","Title","Enrolled","Location","Days","Time","Instructor"];
-    const expectedFields = ["courseId","enrollCd","section","title","enrolled","location","days","time","instructor"];
+    const expectedHeaders = ["Course ID", "Enroll Code", "Is Section?", "Title", "Enrolled", "Location", "Days", "Time", "Instructor"];
+    const expectedFields = ["courseId", "classSections.enrollCode", "isSection", "title", "enrolled", "location", "days", "time", "instructor"];
     const testId = "PersonalSectionsTable";
-
+    
     expectedHeaders.forEach((headerText) => {
       const header = screen.getByText(headerText);
       expect(header).toBeInTheDocument();
@@ -85,163 +79,17 @@ describe("UserTable tests", () => {
       expect(header).toBeInTheDocument();
     });
 
-    expect(screen.getByTestId(`${testId}-cell-row-0-col-id`)).toHaveTextContent("1");
-    expect(screen.getByTestId(`${testId}-cell-row-1-col-id`)).toHaveTextContent("2");
-
-    // const editButton = screen.getByTestId(`${testId}-cell-row-0-col-Edit-button`);
-    // expect(editButton).toBeInTheDocument();
-    // expect(editButton).toHaveClass("btn-primary");
-
-    // const deleteButton = screen.getByTestId(`${testId}-cell-row-0-col-Delete-button`);
-    // expect(deleteButton).toBeInTheDocument();
-    // expect(deleteButton).toHaveClass("btn-danger");
+    expect(screen.getByTestId(`${testId}-cell-row-0-col-courseId`)).toHaveTextContent("ECE 1A -1");
+    expect(screen.getByTestId(`${testId}-cell-row-0-col-classSections.enrollCode`)).toHaveTextContent("12583");
+    expect(screen.getByTestId(`${testId}-cell-row-0-col-title`)).toHaveTextContent("COMP ENGR SEMINAR");
+    expect(screen.getByTestId(`${testId}-cell-row-1-col-isSection`)).toHaveTextContent("true");
+    expect(screen.getByTestId(`${testId}-cell-row-2-col-enrolled`)).toHaveTextContent("102/125");
+    expect(screen.getByTestId(`${testId}-cell-row-2-col-days`)).toHaveTextContent("M W F");
+    expect(screen.getByTestId(`${testId}-cell-row-2-col-location`)).toHaveTextContent("LSB 1001");
+    expect(screen.getByTestId(`${testId}-cell-row-2-col-time`)).toHaveTextContent("12:00 PM - 12:50 PM");
+    expect(screen.getByTestId(`${testId}-cell-row-2-col-instructor`)).toHaveTextContent("LIN Q");
 
   });
-  
-  test("Has the expected colum headers and content for adminUser", () => {
 
-    const currentUser = currentUserFixtures.adminUser;
-
-    render(
-      <QueryClientProvider client={queryClient}>
-        <MemoryRouter>
-          <PersonalSectionsTable personalSections={personalSectionsFixtures.threePersonalSections} currentUser={currentUser} />
-        </MemoryRouter>
-      </QueryClientProvider>
-    );
-
-    const expectedHeaders = ["Course ID", "Enroll Code","Section","Title","Enrolled","Location","Days","Time","Instructor"];
-    const expectedFields = ["courseId","enrollCd","section","title","enrolled","location","days","time","instructor"];
-    const testId = "PersonalSectionsTable";
-
-    expectedHeaders.forEach((headerText) => {
-      const header = screen.getByText(headerText);
-      expect(header).toBeInTheDocument();
-    });
-
-    expectedFields.forEach((field) => {
-      const header = screen.getByTestId(`${testId}-cell-row-0-col-${field}`);
-      expect(header).toBeInTheDocument();
-    });
-
-    expect(screen.getByTestId(`${testId}-cell-row-0-col-id`)).toHaveTextContent("1");
-    expect(screen.getByTestId(`${testId}-cell-row-1-col-id`)).toHaveTextContent("2");
-
-    // const editButton = screen.getByTestId(`${testId}-cell-row-0-col-Edit-button`);
-    // expect(editButton).toBeInTheDocument();
-    // expect(editButton).toHaveClass("btn-primary");
-
-    // const deleteButton = screen.getByTestId(`${testId}-cell-row-0-col-Delete-button`);
-    // expect(deleteButton).toBeInTheDocument();
-    // expect(deleteButton).toHaveClass("btn-danger");
-  });
-
-//   test("Edit button navigates to the edit page for Ordinary user", async () => {
-
-//     const currentUser = currentUserFixtures.userOnly;
-
-//     render(
-//       <QueryClientProvider client={queryClient}>
-//         <MemoryRouter>
-//           <PersonalSectionsTable personalSections={personalSectionsFixtures.threePersonalSections} currentUser={currentUser} />
-//         </MemoryRouter>
-//       </QueryClientProvider>
-//     );
-
-//     expect(await screen.findByTestId(`PersonalSectionsTable-cell-row-0-col-id`)).toHaveTextContent("1");
-
-//     const editButton = screen.getByTestId(`PersonalSectionsTable-cell-row-0-col-Edit-button`);
-//     expect(editButton).toBeInTheDocument();
-    
-//     fireEvent.click(editButton);
-
-//     await waitFor(() => expect(mockedNavigate).toHaveBeenCalledWith('/personalschedules/edit/1'));
-//   });
-//   test("Edit button navigates to the details page for Ordinary user", async () => {
-
-//     const currentUser = currentUserFixtures.userOnly;
-
-//     render(
-//       <QueryClientProvider client={queryClient}>
-//         <MemoryRouter>
-//           <PersonalSchedulesTable personalSchedules={personalScheduleFixtures.threePersonalSchedules} currentUser={currentUser} />
-//         </MemoryRouter>
-//       </QueryClientProvider>
-//     );
-
-//     expect(await screen.findByTestId(`PersonalSchedulesTable-cell-row-0-col-id`)).toHaveTextContent("1");
-
-//     const detailsButton = screen.getByTestId(`PersonalSchedulesTable-cell-row-0-col-Details-button`);
-//     expect(detailsButton).toBeInTheDocument();
-    
-//     fireEvent.click(detailsButton);
-
-//     await waitFor(() => expect(mockedNavigate).toHaveBeenCalledWith('/personalschedules/details/1'));
-//   });
-
-//   test("Edit button navigates to the edit page for admin user", async () => {
-
-//     const currentUser = currentUserFixtures.adminUser;
-
-//     render(
-//       <QueryClientProvider client={queryClient}>
-//         <MemoryRouter>
-//           <PersonalSchedulesTable personalSchedules={personalScheduleFixtures.threePersonalSchedules} currentUser={currentUser} />
-//         </MemoryRouter>
-//       </QueryClientProvider>
-//     );
-
-//     expect(await screen.findByTestId(`PersonalSchedulesTable-cell-row-0-col-id`)).toHaveTextContent("1");
-
-//     const editButton = screen.getByTestId(`PersonalSchedulesTable-cell-row-0-col-Edit-button`);
-//     expect(editButton).toBeInTheDocument();
-    
-//     fireEvent.click(editButton);
-
-//     await waitFor(() => expect(mockedNavigate).toHaveBeenCalledWith('/personalschedules/edit/1'));
-//   });
-
-//   test("Delete button calls delete callback for ordinary user", async () => {
-
-//     const currentUser = currentUserFixtures.userOnly;
-
-//     render(
-//       <QueryClientProvider client={queryClient}>
-//         <MemoryRouter>
-//           <PersonalSchedulesTable personalSchedules={personalScheduleFixtures.threePersonalSchedules} currentUser={currentUser} />
-//         </MemoryRouter>
-//       </QueryClientProvider>
-//     );
-
-//     expect(await screen.findByTestId(`PersonalSchedulesTable-cell-row-0-col-id`)).toHaveTextContent("1");
-
-//     const deleteButton = screen.getByTestId(`PersonalSchedulesTable-cell-row-0-col-Delete-button`);
-//     expect(deleteButton).toBeInTheDocument();
-    
-//     fireEvent.click(deleteButton);
-
-//     await waitFor(() => expect(mockedMutate).toHaveBeenCalledTimes(1));
-//   });
-
-//   test("Delete button calls delete callback for admin user", async () => {
-
-//     const currentUser = currentUserFixtures.adminUser;
-
-//     render(
-//       <QueryClientProvider client={queryClient}>
-//         <MemoryRouter>
-//           <PersonalSchedulesTable personalSchedules={personalScheduleFixtures.threePersonalSchedules} currentUser={currentUser} />
-//         </MemoryRouter>
-//       </QueryClientProvider>
-//     );
-
-//     expect(await screen.findByTestId(`PersonalSchedulesTable-cell-row-0-col-id`)).toHaveTextContent("1");
-
-//     const deleteButton = screen.getByTestId(`PersonalSchedulesTable-cell-row-0-col-Delete-button`);
-//     expect(deleteButton).toBeInTheDocument();
-    
-//     fireEvent.click(deleteButton);
-
-//     await waitFor(() => expect(mockedMutate).toHaveBeenCalledTimes(1));
-//   });
 });
+
