@@ -154,8 +154,7 @@ describe("PersonalSchedulesCreatePage tests", () => {
                 "description": "desc",
                 "quarter": "20124"
             });
-
-            expect(mockToast).toBeCalledWith("Axios Error: Error: Request failed with status code 404");        
+       
             expect(mockToast).toBeCalledWith("Axios Error: PersonalSchedule for ABC in W08 already exists");
     });
 
