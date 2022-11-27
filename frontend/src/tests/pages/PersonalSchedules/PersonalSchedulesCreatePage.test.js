@@ -107,14 +107,10 @@ describe("PersonalSchedulesCreatePage tests", () => {
     test("when you try to store a personal schedule that the pair of name and quarter is not unique, you get a error message and a chance to fix it", async () => {
 
         const queryClient = new QueryClient();
-        const personalSchedule = {
-            id: 17,
-            name: "ABC",
-            description: "desc",
-            quarter: "W08"
+        const expectedError = {
+            message: "PersonalSchedule for ABC in W08 already exists"
         };
-
-        axiosMock.onPost("/api/personalschedules/post").reply( 404, personalSchedule );
+        axiosMock.onPost("/api/personalschedules/post").reply( 404, expectedError );
 
 
         // render the page
@@ -159,7 +155,8 @@ describe("PersonalSchedulesCreatePage tests", () => {
                 "quarter": "20124"
             });
 
-        expect(mockToast).toBeCalledWith("Axios Error: Error: Request failed with status code 404");//
+            expect(mockToast).toBeCalledWith("Axios Error: Error: Request failed with status code 404");        
+            expect(mockToast).toBeCalledWith("Axios Error: PersonalSchedule for ABC in W08 already exists");
     });
 
 });
