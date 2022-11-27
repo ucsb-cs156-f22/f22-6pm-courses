@@ -74,8 +74,6 @@ public class PersonalSectionsController extends ApiController {
                 Course course = objectMapper.readValue(responseBody, Course.class);
                 sections.add(course);
 
-                
-
         }
         return sections;
     }
