@@ -104,4 +104,58 @@ describe("PersonalSchedulesCreatePage tests", () => {
         expect(mockNavigate).toBeCalledWith({ "to": "/personalschedules/list" });
     });
 
+    test("when you try to store a personal schedule that the pair of name and quarter is not unique, you get a error message and a chance to fix it", async () => {
+
+        const queryClient = new QueryClient();
+        const expectedError = {
+            message: "PersonalSchedule for ABC in W08 already exists"
+        };
+        axiosMock.onPost("/api/personalschedules/post").reply( 404, expectedError );
+
+
+        // render the page
+        render(
+            <QueryClientProvider client={queryClient}>
+                <MemoryRouter>
+                    <PersonalSchedulesCreatePage />
+                </MemoryRouter>
+            </QueryClientProvider>
+        );
+
+        // fill in the form
+        expect(await screen.findByTestId("PersonalScheduleForm-name")).toBeInTheDocument();
+
+        const nameField = screen.getByTestId("PersonalScheduleForm-name");
+        const descriptionField = screen.getByTestId("PersonalScheduleForm-description");
+        //const quarterField = document.querySelector("#PersonalScheduleForm-quarter");
+        const quarterField = document.querySelector("#PersonalScheduleForm-quarter");
+        //const selectQuarter = getByLabelText("Quarter")
+        const submitButton = screen.getByTestId("PersonalScheduleForm-submit");
+
+        // fill in the form
+        fireEvent.change(nameField, { target: { value: 'ABC' } });
+        fireEvent.change(descriptionField, { target: { value: 'desc' } });
+        fireEvent.change(quarterField, { target: { value: '20124' } });
+        //userEvent.selectOptions(selectQuarter, "20124");
+
+        // submit the form
+        expect(submitButton).toBeInTheDocument();
+
+        fireEvent.click(submitButton);
+
+        await waitFor(() => expect(axiosMock.history.post.length).toBe(1));//wait for the post request to be made
+
+        expect(quarterField).toHaveValue("20124");
+        //expect(setQuarter).toBeCalledWith("20124"); //need this and axiosMock below?
+
+        expect(axiosMock.history.post[0].params).toEqual(
+            {
+                "name": "ABC",
+                "description": "desc",
+                "quarter": "20124"
+            });
+       
+            expect(mockToast).toBeCalledWith("Axios Error: PersonalSchedule for ABC in W08 already exists");
+    });
+
 });
