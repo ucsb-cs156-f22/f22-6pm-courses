@@ -74,23 +74,6 @@ describe("SinglePersonalScheduleDropdown tests", () => {
     expect(setPersonalSchedule).toBeCalledWith("1");
   });
 
-//   test("out of order personal schedules is sorted by personal schedule id", async () => {
-//     render(
-//       <SinglePersonalScheduleDropdown
-//         personalSchedules={// outOfOrderSubjects}
-//         personalSchedule={personalSchedule}
-//         setPersonalSchedule={setPersonalSchedule}
-//         controlId="spsd1"
-//       />
-//     );
-
-//     expect(await screen.findByText("Personal Schedule")).toBeInTheDocument();
-//     expect(screen.getByText("// ANTH - Anthropology")).toHaveAttribute(
-//       "data-testid",
-//       "spsd1-option-0"
-//     );
-//   });
-
   test("if I pass a non-null onChange, it gets called when the value changes", async () => {
     const onChange = jest.fn();
     render(
@@ -110,7 +93,6 @@ describe("SinglePersonalScheduleDropdown tests", () => {
     await waitFor(() => expect(setPersonalSchedule).toBeCalledWith("1"));
     await waitFor(() => expect(onChange).toBeCalledTimes(1));
 
-    // x.mock.calls[0][0] is the first argument of the first call to the jest.fn() mock x
     const event = onChange.mock.calls[0][0];
     expect(event.target.value).toBe("1");
   });

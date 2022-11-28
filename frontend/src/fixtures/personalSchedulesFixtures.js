@@ -1,34 +1,63 @@
 const personalSchedulesFixtures = {
-    onePersonalSchedule: {
-        "id": 1,
-        "name": "TestName",
-        "description": "TestDescription",
-        "quarter": "W08"
-    },
-    onePersonalScheduleArr: [{
-        "id": 1,
-        "name": "TestName",
-        "description": "TestDescription",
-        "quarter": "W08"
-    }],
+    onePersonalSchedule: [
+        {
+            "id": 1,
+            "user": {
+                "id": 1,
+                "email": "phtcon@ucsb.edu",
+                "googleSub": "115856948234298493496",
+                "pictureUrl": "https://lh3.googleusercontent.com/-bQynVrzVIrU/AAAAAAAAAAI/AAAAAAAAAAA/AMZuucmkGuVsELD1ZeV5iDUAUfe6_K-p8w/s96-c/photo.jpg",
+                "fullName": "Phill Conrad",
+                "givenName": "Phill",
+                "familyName": "Conrad",
+                "emailVerified": true,
+                "locale": "en",
+                "hostedDomain": "ucsb.edu",
+                "admin": true
+            },
+            "description": "Advanced Applications Programming",
+            "quarter": "20221",
+            "name": "CS156"
+        }
+    ],
     twoPersonalSchedules: [
         {
             "id": 1,
-            "name": "TestName1",
-            "description": "TestDescription1",
-            "quarter": "S08"
+            "user": {
+              "id": 1,
+              "email": "phtcon@ucsb.edu",
+              "googleSub": "115856948234298493496",
+              "pictureUrl": "https://lh3.googleusercontent.com/-bQynVrzVIrU/AAAAAAAAAAI/AAAAAAAAAAA/AMZuucmkGuVsELD1ZeV5iDUAUfe6_K-p8w/s96-c/photo.jpg",
+              "fullName": "Phill Conrad",
+              "givenName": "Phill",
+              "familyName": "Conrad",
+              "emailVerified": true,
+              "locale": "en",
+              "hostedDomain": "ucsb.edu",
+              "admin": true
+            },
+            "description": "Advanced Applications Programming",
+            "quarter": "20221",
+            "name": "CS156"
         },
         {
             "id": 2,
-            "name": "TestName2",
-            "description": "TestDescription2",
-            "quarter": "W09"
-        },
-        {
-            "id": 3,
-            "name": "TestName3",
-            "description": "TestDescription3",
-            "quarter": "S12"
+            "user": {
+              "id": 1,
+              "email": "phtcon@ucsb.edu",
+              "googleSub": "115856948234298493496",
+              "pictureUrl": "https://lh3.googleusercontent.com/-bQynVrzVIrU/AAAAAAAAAAI/AAAAAAAAAAA/AMZuucmkGuVsELD1ZeV5iDUAUfe6_K-p8w/s96-c/photo.jpg",
+              "fullName": "Phill Conrad",
+              "givenName": "Phill",
+              "familyName": "Conrad",
+              "emailVerified": true,
+              "locale": "en",
+              "hostedDomain": "ucsb.edu",
+              "admin": true
+            },
+            "description": "Operating Systems",
+            "quarter": "20221",
+            "name": "CS170"
         }
     ]
 };

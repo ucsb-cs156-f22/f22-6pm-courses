@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 
 import SinglePersonalScheduleDropdown from "main/components/PersonalSchedules/SinglePersonalScheduleDropdown";
 import { personalScheduleFixtures } from "fixtures/personalScheduleFixtures";
-// import { personalSchedulesFixtures } from "fixtures/personalSchedulesFixtures";
+import { personalSchedulesFixtures } from "fixtures/personalSchedulesFixtures";
 
 
 export default {
@@ -23,18 +23,18 @@ const Template = (args) => {
     )
 };
 
-// export const OnePersonalSchedule = Template.bind({});
-// OnePersonalSchedule.args = {
-//     personalSchedules: personalSchedulesFixtures.onePersonalSchedule
-// };
+export const OnePersonalSchedule = Template.bind({});
+OnePersonalSchedule.args = {
+    personalSchedules: personalSchedulesFixtures.onePersonalSchedule
+};
 
 export const ThreePersonalSchedules = Template.bind({});
 ThreePersonalSchedules.args = {
     personalSchedules: personalScheduleFixtures.threePersonalSchedules
 };
 
-// export const TwoPersonalSchedules = Template.bind({});
-// TwoPersonalSchedules.args = {
-//     personalSchedules: personalSchedulesFixtures.twoPersonalSchedules
-// };
+export const TwoPersonalSchedules = Template.bind({});
+TwoPersonalSchedules.args = {
+    personalSchedules: personalSchedulesFixtures.twoPersonalSchedules
+};
 
