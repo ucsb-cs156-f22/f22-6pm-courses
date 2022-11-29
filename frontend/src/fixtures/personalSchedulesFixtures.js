@@ -1,5 +1,11 @@
 const personalSchedulesFixtures = {
-    onePersonalSchedule: [
+    onePersonalSchedule: {
+        "id": 1,
+        "description": "Courses I took in Winter",
+        "quarter": "20221",
+        "name": "Brian's Winter Courses"
+    },
+    onePersonalScheduleArr: [
         {
             "id": 1,
             "user": {
@@ -15,12 +21,32 @@ const personalSchedulesFixtures = {
                 "hostedDomain": "ucsb.edu",
                 "admin": true
             },
-            "description": "Advanced Applications Programming",
+            "description": "Courses I took in Winter",
             "quarter": "20221",
-            "name": "CS156"
+            "name": "Brian's Winter Courses"
         }
     ],
     twoPersonalSchedules: [
+        {
+            "id": 1,
+            "description": "Courses I took in Winter1",
+            "quarter": "20221",
+            "name": "Brian's Winter Courses 1"
+        },
+        {
+            "id": 2,
+            "description": "what did Conrad teach in Winter",
+            "quarter": "20221",
+            "name": "Phill's Courses"
+        },
+        {
+            "id": 3,
+            "description": "Spring",
+            "quarter": "20222",
+            "name": "Chris' Courses"
+        }
+    ],
+    twoPersonalSchedulesArr: [
         {
             "id": 1,
             "user": {
@@ -36,9 +62,9 @@ const personalSchedulesFixtures = {
               "hostedDomain": "ucsb.edu",
               "admin": true
             },
-            "description": "Advanced Applications Programming",
+            "description": "Courses I took in Winter",
             "quarter": "20221",
-            "name": "CS156"
+            "name": "Brian's Winter Courses"
         },
         {
             "id": 2,
@@ -55,9 +81,9 @@ const personalSchedulesFixtures = {
               "hostedDomain": "ucsb.edu",
               "admin": true
             },
-            "description": "Operating Systems",
+            "description": "what did Conrad teach in Winter",
             "quarter": "20221",
-            "name": "CS170"
+            "name": "Phill's Courses"
         }
     ]
 };

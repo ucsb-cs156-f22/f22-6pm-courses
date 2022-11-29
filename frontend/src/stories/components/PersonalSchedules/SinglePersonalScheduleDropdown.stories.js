@@ -25,7 +25,7 @@ const Template = (args) => {
 
 export const OnePersonalSchedule = Template.bind({});
 OnePersonalSchedule.args = {
-    personalSchedules: personalSchedulesFixtures.onePersonalSchedule
+    personalSchedules: personalSchedulesFixtures.onePersonalScheduleArr
 };
 
 export const ThreePersonalSchedules = Template.bind({});
@@ -35,6 +35,6 @@ ThreePersonalSchedules.args = {
 
 export const TwoPersonalSchedules = Template.bind({});
 TwoPersonalSchedules.args = {
-    personalSchedules: personalSchedulesFixtures.twoPersonalSchedules
+    personalSchedules: personalSchedulesFixtures.twoPersonalSchedulesArr
 };
 
