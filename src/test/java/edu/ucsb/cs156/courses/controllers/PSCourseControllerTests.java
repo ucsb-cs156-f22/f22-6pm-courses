@@ -512,12 +512,20 @@ public class PSCourseControllerTests extends ControllerTestCase {
 
     @WithMockUser(roles = { "USER" })
     @Test
-    public void api_courses__user_logged_in__delete_course() throws Exception {
+    public void api_courses__user_logged_in__delete_lecture_with_no_section() throws Exception { //Working on
         // arrange
 
         User u = currentUserService.getCurrentUser().getUser();
-        PSCourse ps1 = PSCourse.builder().enrollCd("08250").psId(13L).user(u).id(15L).build();
-        when(coursesRepository.findByIdAndUser(eq(15L), eq(u))).thenReturn(Optional.of(ps1));
+        PersonalSchedule personalschedule1 = PersonalSchedule.builder().name("Test").description("Test").quarter("20224").user(u).id(1L).build();
+        when(personalScheduleRepository.findByIdAndUser(eq(1L), eq(u))).thenReturn(Optional.of(personalschedule1));
+
+        PSCourse expectedCourses = PSCourse.builder().enrollCd("50914").psId(1L).user(u).id(15L).build();
+        when(coursesRepository.save(eq(expectedCourses))).thenReturn(expectedCourses);
+        when(coursesRepository.findByIdAndUser(eq(15L), eq(u))).thenReturn(Optional.of(expectedCourses));
+        ArrayList<PSCourse> expectedResponse = new ArrayList<>();
+        expectedResponse.add(expectedCourses);
+
+        when(ucsbCurriculumService.getAllSections(eq("50914"), eq("20224"))).thenReturn(SectionFixtures.SECTION_JSON_ENGL110A);
 
         // act
         MvcResult response = mockMvc.perform(
@@ -527,10 +535,50 @@ public class PSCourseControllerTests extends ControllerTestCase {
 
         // assert
         verify(coursesRepository, times(1)).findByIdAndUser(15L, u);
-        verify(coursesRepository, times(1)).delete(ps1);
+        verify(coursesRepository, times(1)).delete(expectedCourses);
         Map<String, Object> json = responseToJson(response);
         assertEquals("PSCourse with id 15 deleted", json.get("message"));
     }
+
+    @WithMockUser(roles = { "USER" })
+    @Test
+    public void api_courses__user_logged_in__delete_lecture_with_section() throws Exception { //Has issue
+        // arrange
+
+        User u = currentUserService.getCurrentUser().getUser();
+        PersonalSchedule personalschedule1 = PersonalSchedule.builder().name("Test").description("Test").quarter("20224").user(u).id(1L).build();
+        when(personalScheduleRepository.findByIdAndUser(eq(1L), eq(u))).thenReturn(Optional.of(personalschedule1));
+
+        PSCourse expectedLecture = PSCourse.builder().enrollCd("58891").psId(1L).user(u).id(15L).build();
+        when(coursesRepository.save(eq(expectedLecture))).thenReturn(expectedLecture);
+        when(coursesRepository.findByIdAndUser(eq(15L), eq(u))).thenReturn(Optional.of(expectedLecture));
+        
+        PSCourse expectedSection = PSCourse.builder().enrollCd("58909").psId(1L).user(u).id(16L).build();
+        when(coursesRepository.save(eq(expectedSection))).thenReturn(expectedSection);
+        when(coursesRepository.findByIdAndUser(eq(15L), eq(u))).thenReturn(Optional.of(expectedSection));
+        
+        ArrayList<PSCourse> expectedResponse = new ArrayList<>();
+        expectedResponse.add(expectedLecture);
+        expectedResponse.add(expectedSection);
+
+        when(ucsbCurriculumService.getAllSections(eq("58891"), eq("20224"))).thenReturn(SectionFixtures.SECTION_JSON_CMPSC156);
+
+        // act
+        MvcResult response = mockMvc.perform(
+                delete("/api/courses/user?id=15")
+                        .with(csrf()))
+                .andExpect(status().isOk()).andReturn();
+
+        // assert
+        verify(coursesRepository, times(1)).findByIdAndUser(15L, u);
+        verify(coursesRepository, times(1)).delete(expectedLecture);
+        verify(coursesRepository, times(1)).findByIdAndUser(16L, u);
+        verify(coursesRepository, times(1)).delete(expectedSection);
+        Map<String, Object> json = responseToJson(response);
+        assertEquals("PSCourse with id 15 and matching secondary with id 16 deleted", json.get("message"));
+    }
+
+    //Going to add 3rd test which is delete section with lecture
 
     @WithMockUser(roles = { "USER" })
     @Test
