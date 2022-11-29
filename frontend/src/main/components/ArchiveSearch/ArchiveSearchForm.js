@@ -1,7 +1,5 @@
 import { useState, useEffect } from "react";
 import { Form, Button, Container, Row, Col } from "react-bootstrap";
-
-import { allTheLevels } from "fixtures/levelsFixtures";
 import { quarterRange } from "main/utils/quarterUtilities";
 
 import { useSystemInfo } from "main/utils/systemInfo";
@@ -9,7 +7,7 @@ import SingleQuarterDropdown from "../Quarters/SingleQuarterDropdown";
 import SingleSubjectDropdown from "../Subjects/SingleSubjectDropdown";
 import { useBackendMutation } from "main/utils/useBackend";
 
-const ArchiveSearchForm = ({ setCourseJSON, fetchJSON }) => {
+const ArchiveSearchForm = ({ fetchJSON }) => {
    const { data : systemInfo } = useSystemInfo();
 
   // Stryker disable OptionalChaining
