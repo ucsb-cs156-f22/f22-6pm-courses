@@ -68,7 +68,7 @@ describe("CourseSearchPage tests", () => {
     userEvent.selectOptions(selectQuarter, "20211");
     const selectSubject = screen.getByLabelText("Subject Area");
 
-    expect(await screen.findByTestId("BasicSearch.Subject-option-ANTH")).toHaveTextContent("ANTH");
+    expect(await screen.findByTestId("BasicSearch.Subject-option-ANTH")).toBeInTheDocument();
 
     userEvent.selectOptions(selectSubject, "ANTH");
     const selectLevel = screen.getByLabelText("Course Level");
