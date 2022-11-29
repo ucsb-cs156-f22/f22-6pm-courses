@@ -1,11 +1,11 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Form, Button, Container, Row, Col } from "react-bootstrap";
 import { quarterRange } from "main/utils/quarterUtilities";
 
 import { useSystemInfo } from "main/utils/systemInfo";
 import SingleQuarterDropdown from "../Quarters/SingleQuarterDropdown";
 import SingleSubjectDropdown from "../Subjects/SingleSubjectDropdown";
-import { useBackendMutation } from "main/utils/useBackend";
+import { useBackend } from "main/utils/useBackend";
 
 const ArchiveSearchForm = ({ fetchJSON }) => {
    const { data : systemInfo } = useSystemInfo();
@@ -23,32 +23,23 @@ const ArchiveSearchForm = ({ fetchJSON }) => {
   const localSubject = localStorage.getItem("ArchiveSearch.Subject");
   const localCourseNumber = localStorage.getItem("ArchiveSearch.CourseNumber");
 
-  const getObjectToAxiosParams = () => ({
-    url: "api/UCSBSubjects/all",
-    method: "GET",
-    params: {},
-  });
+    // GET Example:
+    // useBackend(
+    //     ["/api/admin/users"],
+    //     { method: "GET", url: "/api/admin/users" },
+    //     []
+    // );
 
-  const onSuccess = (listSubjects) => {
-    setSubjects(listSubjects);
-  };
-
-  const getMutation = useBackendMutation(
-    getObjectToAxiosParams,
-    { onSuccess },
-    // Stryker disable next-line all : hard to set up test for caching
+  const { data : subjects, error: _error } = useBackend(
+    ["/api/UCSBSubjects/all"],
+    { method : "GET", url: "/api/UCSBSubjects/all"},
     []
   );
-
-  useEffect(() => {
-    getMutation.mutate();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  
 
   const [startQuarter, setStartQuarter] = useState(localStartQuarter || quarters[0].yyyyq);
   const [endQuarter, setEndQuarter] = useState(localEndQuarter || quarters[0].yyyyq);
   const [subject, setSubject] = useState(localSubject || {});
-  const [subjects, setSubjects] = useState([]);
   const [courseNumber, setCourseNumber] = useState(localCourseNumber || "");
   const [courseSuf, setCourseSuf] = useState("");
 
