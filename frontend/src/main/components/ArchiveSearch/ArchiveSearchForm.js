@@ -30,7 +30,9 @@ const ArchiveSearchForm = ({ fetchJSON }) => {
     //     []
     // );
 
-  const { data : subjects, error: _error } = useBackend(
+  const { data : subjects, error: _error, status: _status } = 
+  useBackend(
+    // Stryker disable next-line all : don't test internal caching of React Query
     ["/api/UCSBSubjects/all"],
     { method : "GET", url: "/api/UCSBSubjects/all"},
     []
