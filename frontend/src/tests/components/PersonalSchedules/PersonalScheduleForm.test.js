@@ -165,5 +165,32 @@ describe("PersonalScheduleForm tests", () => {
         expect(quarter).toHaveValue("20211");
     });
 
+    test("Correct Error messages on large name input", async () => {
+        const mockSubmitAction = jest.fn();
+
+        render(
+            <QueryClientProvider client={queryClient}>
+                <Router>
+                    <PersonalScheduleForm submitAction={mockSubmitAction} />
+                </Router>
+            </QueryClientProvider>
+        );
+
+        expect(await screen.findByTestId("PersonalScheduleForm-name")).toBeInTheDocument();
+
+        const name = screen.getByTestId("PersonalScheduleForm-name");
+        const description = screen.getByTestId("PersonalScheduleForm-description");
+        const quarter = document.querySelector("#PersonalScheduleForm-quarter");
+        const submitButton = screen.getByTestId("PersonalScheduleForm-submit");
+
+        fireEvent.change(name, { target: { value: 'This is a really long name that shouldnt be valid' } });
+        fireEvent.change(description, { target: { value: 'test' } });
+        fireEvent.change(quarter, { target: { value: '20124' } });
+        fireEvent.click(submitButton);
+
+        expect(screen.queryByText(/Name must be no more than 15 characters./)).not.toBeInTheDocument();
+        expect(screen.queryByText(/Description is required./)).not.toBeInTheDocument();
+        expect(quarter).toHaveValue("20154");
+    });
 
 });

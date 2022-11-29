@@ -34,7 +34,8 @@ describe("utils/systemInfo tests", () => {
                 springH2ConsoleEnabled: false,
                 showSwaggerUILink: false,
                 startQtrYYYYQ: "20221",
-                endQtrYYYYQ: "20222"  
+                endQtrYYYYQ: "20222",
+                sourceRepo: "https://github.com/ucsb-cs156/proj-courses"  
             });
             
             const queryState = queryClient.getQueryState("systemInfo");
@@ -95,7 +96,8 @@ describe("utils/systemInfo tests", () => {
                 springH2ConsoleEnabled: false,
                 showSwaggerUILink: false,
                 startQtrYYYYQ: "20221",
-                endQtrYYYYQ: "20222"
+                endQtrYYYYQ: "20222",
+                sourceRepo: "https://github.com/ucsb-cs156/proj-courses"  
             });
             queryClient.clear();
         });

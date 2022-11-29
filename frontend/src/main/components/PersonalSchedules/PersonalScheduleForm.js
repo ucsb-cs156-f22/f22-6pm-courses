@@ -33,6 +33,8 @@ function PersonalScheduleForm({ initialPersonalSchedule, submitAction, buttonLab
         quarters: quarters
     }.quarters[0]);
 
+    const name_regex = /^.{0,15}$/;
+
     return (
 
         <Form onSubmit={handleSubmit(submitAction)}>
@@ -59,11 +61,13 @@ function PersonalScheduleForm({ initialPersonalSchedule, submitAction, buttonLab
                     type="text"
                     isInvalid={Boolean(errors.name)}
                     {...register("name", {
-                        required: "Name is required."
+                        required: true, pattern: name_regex
                     })}
+                    
                 />
                 <Form.Control.Feedback type="invalid">
-                    {errors.name?.message}
+                    {errors.name && 'Name is required. '}
+                    {errors.name?.type === 'pattern' && "Name must be no more than 15 characters."}
                 </Form.Control.Feedback>
             </Form.Group>
 
