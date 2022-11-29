@@ -512,12 +512,36 @@ public class PSCourseControllerTests extends ControllerTestCase {
 
     @WithMockUser(roles = { "USER" })
     @Test
-    public void api_courses__user_logged_in__delete_course() throws Exception {
+    public void api_courses__user_logged_in__delete_lecture_with_no_section() throws Exception {
+        // arrange
+        User u = currentUserService.getCurrentUser().getUser();
+        PersonalSchedule personalschedule1 = PersonalSchedule.builder().name("Test").description("Test").quarter("20224").user(u).id(1L).build();
+        when(personalScheduleRepository.findByIdAndUser(eq(1L), eq(u))).thenReturn(Optional.of(personalschedule1));
+        PSCourse ps1 = PSCourse.builder().enrollCd("50914").psId(1L).user(u).id(15L).build();
+        when(coursesRepository.findByIdAndUser(eq(15L), eq(u))).thenReturn(Optional.of(ps1));
+
+        // act
+        MvcResult response = mockMvc.perform(
+                delete("/api/courses/user?id=15")
+                        .with(csrf()))
+                .andExpect(status().isOk()).andReturn();
+        // assert
+        verify(coursesRepository, times(1)).findByIdAndUser(15L, u);
+        verify(coursesRepository, times(1)).delete(ps1);
+        Map<String, Object> json = responseToJson(response);
+        assertEquals("PSCourse with id 15 deleted", json.get("message"));
+    }
+
+    @WithMockUser(roles = { "USER" })
+    @Test
+    public void api_courses__user_logged_in__delete_lecture_with_section() throws Exception {
         // arrange
 
         User u = currentUserService.getCurrentUser().getUser();
-        PSCourse ps1 = PSCourse.builder().enrollCd("08250").psId(13L).user(u).id(15L).build();
-        when(coursesRepository.findByIdAndUser(eq(15L), eq(u))).thenReturn(Optional.of(ps1));
+        PSCourse lecture = PSCourse.builder().enrollCd("08045").psId(13L).user(u).id(15L).build();
+        PSCourse section = PSCourse.builder().enrollCd("08052").psId(13L).user(u).id(16L).build();
+        when(coursesRepository.findByIdAndUser(eq(15L), eq(u))).thenReturn(Optional.of(lecture));
+        when(coursesRepository.findByIdAndUser(eq(16L), eq(u))).thenReturn(Optional.of(section));
 
         // act
         MvcResult response = mockMvc.perform(
@@ -527,9 +551,37 @@ public class PSCourseControllerTests extends ControllerTestCase {
 
         // assert
         verify(coursesRepository, times(1)).findByIdAndUser(15L, u);
-        verify(coursesRepository, times(1)).delete(ps1);
+        verify(coursesRepository, times(1)).delete(lecture);
+        verify(coursesRepository, times(1)).findByIdAndUser(16L, u);
+        verify(coursesRepository, times(1)).delete(section);
         Map<String, Object> json = responseToJson(response);
-        assertEquals("PSCourse with id 15 deleted", json.get("message"));
+        assertEquals("PSCourse with id 15 and matching secondary with id 16 deleted", json.get("message"));
+    }
+
+    @WithMockUser(roles = { "USER" })
+    @Test
+    public void api_courses__user_logged_in__delete_section_with_lecture() throws Exception {
+        // arrange
+
+        User u = currentUserService.getCurrentUser().getUser();
+        PSCourse lecture = PSCourse.builder().enrollCd("08045").psId(13L).user(u).id(15L).build();
+        PSCourse section = PSCourse.builder().enrollCd("08052").psId(13L).user(u).id(16L).build();
+        when(coursesRepository.findByIdAndUser(eq(15L), eq(u))).thenReturn(Optional.of(lecture));
+        when(coursesRepository.findByIdAndUser(eq(16L), eq(u))).thenReturn(Optional.of(section));
+
+        // act
+        MvcResult response = mockMvc.perform(
+                delete("/api/courses/user?id=16")
+                        .with(csrf()))
+                .andExpect(status().isOk()).andReturn();
+
+        // assert
+        verify(coursesRepository, times(1)).findByIdAndUser(16L, u);
+        verify(coursesRepository, times(1)).delete(section);
+        verify(coursesRepository, times(1)).findByIdAndUser(15L, u);
+        verify(coursesRepository, times(1)).delete(lecture);
+        Map<String, Object> json = responseToJson(response);
+        assertEquals("PSCourse with id 16 and matching primary with id 15 deleted", json.get("message"));
     }
 
     @WithMockUser(roles = { "USER" })

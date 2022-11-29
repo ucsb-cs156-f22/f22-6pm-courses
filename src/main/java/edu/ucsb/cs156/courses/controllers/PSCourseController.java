@@ -187,16 +187,153 @@ public class PSCourseController extends ApiController {
         return genericMessage("PSCourse with id %s deleted".formatted(id));
     }
 
-    @ApiOperation(value = "Delete a course (user)")
+    @ApiOperation(value = "Delete a course (user)") //WORKING ON
     @PreAuthorize("hasRole('ROLE_USER')")
     @DeleteMapping("/user")
     public Object deleteCourses(
-            @ApiParam("id") @RequestParam Long id) {
+            @ApiParam("id") @RequestParam Long id) throws JsonProcessingException {
         User currentUser = getCurrentUser().getUser();
-        PSCourse courses = coursesRepository.findByIdAndUser(id, currentUser)
+        PSCourse course = coursesRepository.findByIdAndUser(id, currentUser)
           .orElseThrow(() -> new EntityNotFoundException(PSCourse.class, id));
-        coursesRepository.delete(courses);
-        return genericMessage("PSCourse with id %s deleted".formatted(id));
+        
+        
+        String enrollmentCode = course.getEnrollCd();
+
+        PersonalSchedule checkPsId = personalScheduleRepository.findByIdAndUser(course.getPsId(), currentUser)
+        .orElseThrow(() -> new EntityNotFoundException(PersonalSchedule.class, course.getPsId()));
+        
+        String body = ucsbCurriculumService.getAllSections(enrollmentCode, checkPsId.getQuarter());
+        
+        // WAS ATTEMPTING ANOTHER WAY, DIDN'T WORK, ALSO STILL RAN INTO SAME ISSUES WHEN DOING mvn test AS CURRENT METHOD DOES
+        //String primaryCode = null;
+        // Long primaryId = id;
+        // Long secondaryId = id;
+        // String tester = ucsbCurriculumService.getSection(enrollmentCode, checkPsId.getQuarter());
+        // JsonNode testSection = mapper.readTree(tester).path("classSections").elements().next();
+        // String section = testSection.path("section").asText();
+        // String isSecondary = testSection.path("secondaryStatus").asText();
+        // String output = "poop";
+        // if (section.endsWith("00") && isSecondary.equals("null")) { //Lecture with no section
+        //     output = "Lecture with no section";
+        //     coursesRepository.delete(course);
+        //     return genericMessage("PSCourse with id %s deleted".formatted(id));
+        // } else if (section.endsWith("00")) { //Lecture with section
+        //     Iterator<JsonNode> allSections = mapper.readTree(body).path("classSections").elements();
+        //     while (allSections.hasNext()) {
+        //         JsonNode node = allSections.next();
+        //         String diffSection = node.path("section").asText();
+        //         String primaryCode = null;
+        //         if (diffSection.endsWith("00")) {
+        //             primaryCode = node.path("enrollCode").asText();
+        //             Iterable<PSCourse> userCourses = thisUsersCoursesForPsId(course.getPsId());
+        //             for (PSCourse psc: userCourses) {
+        //                 if (psc.getEnrollCd().equals(primaryCode)) {
+        //                     primaryId = psc.getId();
+        //                 }
+        //             }
+        //         } else {
+        //             break;
+        //         }
+        //     }
+        //     final Long id1 = primaryId;
+        //     final Long id2 = secondaryId;
+        //     PSCourse primaryCourse = coursesRepository.findById(primaryId)
+        //     .orElseThrow(() -> new EntityNotFoundException(PSCourse.class, id1));
+        //     PSCourse secondaryCourse = coursesRepository.findById(secondaryId)
+        //     .orElseThrow(() -> new EntityNotFoundException(PSCourse.class, id2));
+        //     coursesRepository.delete(primaryCourse);
+        //     coursesRepository.delete(secondaryCourse);
+        //     return genericMessage("PSCourse with id %s and matching primary with id %s deleted".formatted(secondaryId, primaryId));
+        // } else { //Section with lecture
+        //     Iterator<JsonNode> allSections2 = mapper.readTree(body).path("classSections").elements();
+        //     Iterable<PSCourse> currentCourses = thisUsersCoursesForPsId(course.getPsId());
+        //     while (allSections2.hasNext()) {
+        //         JsonNode node2 = allSections2.next();
+        //         String sectionCodes = node2.path("enrollCode").asText();
+        //         for (PSCourse psc: currentCourses) {
+        //             if (psc.getEnrollCd().equals(sectionCodes)) {
+        //                 secondaryId = psc.getId();
+        //             }
+        //         }
+        //     }
+        //     final Long id1 = primaryId;
+        //     final Long id2 = secondaryId;
+        //     PSCourse primaryCourse = coursesRepository.findById(primaryId)
+        //     .orElseThrow(() -> new EntityNotFoundException(PSCourse.class, id1));
+        //     PSCourse secondaryCourse = coursesRepository.findById(secondaryId)
+        //     .orElseThrow(() -> new EntityNotFoundException(PSCourse.class, id2));
+        //     coursesRepository.delete(primaryCourse);
+        //     coursesRepository.delete(secondaryCourse);
+        //     return genericMessage("PSCourse with id %s and matching secondary with id %s deleted".formatted(primaryId, secondaryId));
+        // }
+        //return genericMessage(tester);
+        //JsonNode currentSection = ;
+        
+        Long primaryId = id;
+        Long secondaryId = id;
+        String primaryCode = null;
+        boolean hasSecondary = false;
+        Iterator<JsonNode> allSections = mapper.readTree(body).path("classSections").elements(); //believes this is source of nestserlet issues for mvn test, don't know why
+        
+        while (allSections.hasNext()) {
+            JsonNode node = allSections.next();
+            String section = node.path("section").asText();
+            if (section.endsWith("00")) {
+                primaryCode = node.path("enrollCode").asText();
+                Iterable<PSCourse> userCourses = thisUsersCoursesForPsId(course.getPsId());
+                for (PSCourse psc: userCourses) {
+                    if (psc.getEnrollCd().equals(primaryCode)) {
+                        primaryId = psc.getId();
+                    }
+                }
+            }
+            else {
+                hasSecondary = true;
+                break;
+            }
+        }
+
+        if (primaryCode == null) {
+            primaryCode = enrollmentCode;
+            hasSecondary = false;
+        }
+
+        if (!hasSecondary) { //lecture is given, has no sectios, just delete lecture
+            coursesRepository.delete(course);
+            return genericMessage("PSCourse with id %s deleted".formatted(id));
+        }
+        if (enrollmentCode.equals(primaryCode)) { //given id of lecture, delete lecture and find and delete associated section NOT WORKING (NEED TO FIND SECTION)
+            Iterator<JsonNode> allSections2 = mapper.readTree(body).path("classSections").elements();
+            Iterable<PSCourse> currentCourses = thisUsersCoursesForPsId(course.getPsId());
+            while (allSections2.hasNext()) {
+                JsonNode node2 = allSections2.next();
+                String sectionCodes = node2.path("enrollCode").asText();
+                for (PSCourse psc: currentCourses) {
+                    if (psc.getEnrollCd().equals(sectionCodes)) {
+                        secondaryId = psc.getId();
+                    }
+                }
+            }
+            final Long id1 = primaryId;
+            final Long id2 = secondaryId;
+            PSCourse primaryCourse = coursesRepository.findById(primaryId)
+            .orElseThrow(() -> new EntityNotFoundException(PSCourse.class, id1));
+            PSCourse secondaryCourse = coursesRepository.findById(secondaryId)
+            .orElseThrow(() -> new EntityNotFoundException(PSCourse.class, id2));
+            coursesRepository.delete(primaryCourse);
+            coursesRepository.delete(secondaryCourse);
+            return genericMessage("PSCourse with id %s and matching secondary with id %s deleted".formatted(primaryId, secondaryId));
+        } else { //given id of section, delete section and find and delete associated lecture
+            final Long id1 = primaryId;
+            final Long id2 = secondaryId;
+            PSCourse primaryCourse = coursesRepository.findById(primaryId)
+            .orElseThrow(() -> new EntityNotFoundException(PSCourse.class, id1));
+            PSCourse secondaryCourse = coursesRepository.findById(secondaryId)
+            .orElseThrow(() -> new EntityNotFoundException(PSCourse.class, id2));
+            coursesRepository.delete(primaryCourse);
+            coursesRepository.delete(secondaryCourse);
+            return genericMessage("PSCourse with id %s and matching primary with id %s deleted".formatted(secondaryId, primaryId));
+        }
     }
 
     @ApiOperation(value = "Update a single Course (admin)")
