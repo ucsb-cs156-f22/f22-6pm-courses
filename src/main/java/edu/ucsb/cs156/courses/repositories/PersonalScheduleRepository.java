@@ -11,6 +11,7 @@ import java.util.Optional;
 @Repository
 public interface PersonalScheduleRepository extends CrudRepository<PersonalSchedule, Long> {
   Optional<PersonalSchedule> findByIdAndUser(long id, User user);
+  Optional<PersonalSchedule> findByUser(User user);
   Iterable<PersonalSchedule> findAllByUserId(Long user_id);
   Optional<PersonalSchedule> findByNameAndQuarter(String name, String quarter);
 }
