@@ -18,25 +18,30 @@ jest.mock("react-toastify", () => ({
 }));
 
 describe("ArchiveSearchForm tests", () => {
-    beforeEach(() => {
-        jest.spyOn(console, 'error')
-        console.error.mockImplementation(() => null);
-    });
     const axiosMock = new AxiosMockAdapter(axios);
-    beforeEach(() => {
-    axiosMock
-      .onGet("/api/currentUser")
-      .reply(200, apiCurrentUserFixtures.userOnly);
-    axiosMock
-      .onGet("/api/systemInfo")
-      .reply(200, systemInfoFixtures.showingNeither);
-    });
+
     const queryClient = new QueryClient();
     const addToast = jest.fn();
+
     beforeEach(() => {
-    toast.mockReturnValue({
-      addToast: addToast,
-     });
+      jest.clearAllMocks();
+      jest.spyOn(console, 'error')
+      console.error.mockImplementation(() => null);
+
+      axiosMock
+        .onGet("/api/currentUser")
+        .reply(200, apiCurrentUserFixtures.userOnly);
+      axiosMock
+        .onGet("/api/systemInfo")
+        .reply(200, {
+          ...systemInfoFixtures.showingNeither,
+          "startQtrYYYYQ": "20201",
+          "endQtrYYYYQ": "20214"
+        });
+
+      toast.mockReturnValue({
+        addToast: addToast,
+      });
     });
 
     test("renders without crashing", () => {
@@ -86,9 +91,8 @@ describe("ArchiveSearchForm tests", () => {
           </QueryClientProvider>
         );
     
-        await waitFor(() => {
-          expect(axiosMock.history.get.length).toBeGreaterThanOrEqual(1);
-        });
+        const expectedKey = "ArchiveSearch.Subject-option-MATH";
+        await waitFor(() => expect(screen.getByTestId(expectedKey).toBeInTheDocument));
         const selectSubject = screen.getByLabelText("Subject Area");
         userEvent.selectOptions(selectSubject, "MATH");
         expect(selectSubject.value).toBe("MATH");
@@ -120,9 +124,8 @@ describe("ArchiveSearchForm tests", () => {
           courseSuf: "A"
         };
     
-        await waitFor(() => {
-          expect(axiosMock.history.get.length).toBeGreaterThanOrEqual(1);
-        });
+        const expectedKey = "ArchiveSearch.Subject-option-CMPSC";
+        await waitFor(() => expect(screen.getByTestId(expectedKey).toBeInTheDocument));
     
         const selectStartQuarter = screen.getByLabelText("Start Quarter");
         userEvent.selectOptions(selectStartQuarter, "20211");
@@ -162,9 +165,8 @@ describe("ArchiveSearchForm tests", () => {
           </QueryClientProvider>
         );
     
-        await waitFor(() => {
-          expect(axiosMock.history.get.length).toBeGreaterThanOrEqual(1);
-        });
+        const expectedKey = "ArchiveSearch.Subject-option-CMPSC";
+    await waitFor(() => expect(screen.getByTestId(expectedKey).toBeInTheDocument));
     
         const selectStartQuarter = screen.getByLabelText("Start Quarter");
         userEvent.selectOptions(selectStartQuarter, "20204");

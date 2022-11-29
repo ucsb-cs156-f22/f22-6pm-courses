@@ -1,7 +1,7 @@
 import React from "react";
 
 import ArchiveSearchForm from "main/components/ArchiveSearch/ArchiveSearchForm";
-import {allTheSubjects} from "fixtures/ucsbSubjectsFixtures";
+import {allTheSubjects} from "fixtures/subjectFixtures";
 import { systemInfoFixtures } from "fixtures/systemInfoFixtures";
 
 export default {
@@ -33,7 +33,8 @@ export const Default = Template.bind({});
 
 Default.args = {
     submitText: "Create",
-    submitAction: () => {
-        console.log("Submit was clicked");
-    },
-};
+    fetchJSON: (_event, data) => {
+      console.log("Submit was clicked, data=", data);
+    }
+  };
+  

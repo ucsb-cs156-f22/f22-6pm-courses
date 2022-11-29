@@ -98,15 +98,17 @@ const ArchiveSearchForm = ({ fetchJSON }) => {
                 />
                 </Col>
             </Row>
-            <Form.Group controlId="CourseNameSearch.CourseNumber">
-                <Form.Label>Course Number (Try searching '16' or '130A')</Form.Label>
-                <Form.Control onChange={handleCourseNumberOnChange} defaultValue={courseNumber} />
-            </Form.Group>
-                <Col md="auto">
-                    <Button variant="primary" type="submit">
-                        Submit
-                    </Button>
-                </Col>
+            <Row style={{ paddingTop: 10, paddingBottom: 10 }}>
+                <Form.Group controlId="CourseNameSearch.CourseNumber">
+                    <Form.Label>Course Number (Try searching '16' or '130A')</Form.Label>
+                    <Form.Control onChange={handleCourseNumberOnChange} defaultValue={courseNumber} />
+                </Form.Group>
+                    <Col md="auto">
+                        <Button variant="primary" type="submit">
+                            Submit
+                        </Button>
+                    </Col>
+            </Row>
         </Container>
     </Form>
   )
