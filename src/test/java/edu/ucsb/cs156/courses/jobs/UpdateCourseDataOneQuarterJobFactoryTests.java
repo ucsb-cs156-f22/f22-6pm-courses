@@ -15,6 +15,10 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import edu.ucsb.cs156.courses.collections.ConvertedSectionCollection;
 import edu.ucsb.cs156.courses.services.UCSBCurriculumService;
 import edu.ucsb.cs156.courses.controllers.UCSBSubjectsController;
+import edu.ucsb.cs156.courses.entities.UCSBSubject;
+
+import java.util.ArrayList;
+import java.util.List;
 
 
 @RestClientTest(UpdateCourseDataOneQuarterJobFactory.class)
@@ -36,6 +40,11 @@ public class UpdateCourseDataOneQuarterJobFactoryTests {
     @Test
     void test_create() throws Exception {
 
+        List<String> subjects = new ArrayList<String>();
+        Iterable<UCSBSubject> UCSBSubjects = subjectsController.allSubjects();
+        for (UCSBSubject UCSBSubject : UCSBSubjects) 
+            subjects.add(UCSBSubject.getSubjectCode());
+
         // Act
 
         UpdateCourseDataOneQuarterJob updateCourseDataOneQuarterJob = updateCourseDataOneQuarterJobFactory.create("20211");
@@ -45,6 +54,7 @@ public class UpdateCourseDataOneQuarterJobFactoryTests {
         assertEquals("20211",updateCourseDataOneQuarterJob.getQuarterYYYYQ());
         assertEquals(ucsbCurriculumService,updateCourseDataOneQuarterJob.getUcsbCurriculumService());
         assertEquals(convertedSectionCollection,updateCourseDataOneQuarterJob.getConvertedSectionCollection());
+        assertEquals(subjects,updateCourseDataOneQuarterJob.getSubjects());
 
     }
 }
