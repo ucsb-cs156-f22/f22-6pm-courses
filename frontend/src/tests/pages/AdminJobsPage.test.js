@@ -36,7 +36,7 @@ describe("AdminJobsPage tests", () => {
         expect(await screen.findByText("Launch Jobs")).toBeInTheDocument();
         expect(await screen.findByText("Job Status")).toBeInTheDocument();
 
-        ["Test Job", "Update Courses Database", "Update Grade Info"].map(
+        ["Test Job", "Update Courses Database", "Update Courses Database, One Quarter", "Update Grade Info"].map(
             (jobName) => expect(screen.getByText(jobName)).toBeInTheDocument()
         );
 
@@ -119,5 +119,35 @@ describe("AdminJobsPage tests", () => {
         expect(axiosMock.history.post[0].url).toBe("/api/jobs/launch/updateCourses?quarterYYYYQ=20211&subjectArea=ANTH");
     });
 
+    test("user can submit the update course data one quarter job", async () => {
+        render(
+            <QueryClientProvider client={queryClient}>
+                <MemoryRouter>
+                    <AdminJobsPage />
+                </MemoryRouter>
+            </QueryClientProvider>
+        );
+
+        expect(await screen.findByText("Update Courses Database, One Quarter")).toBeInTheDocument();
+
+        const updateCoursesOneQuarterButton = screen.getByText("Update Courses Database, One Quarter");
+        expect(updateCoursesOneQuarterButton).toBeInTheDocument();
+        updateCoursesOneQuarterButton.click();
+
+        expect(await screen.findByTestId("TestJobForm-fail")).toBeInTheDocument();
+
+        const submitButton = screen.getByText("Update Courses");
+    
+        const selectQuarter = screen.getByLabelText("Quarter");
+        userEvent.selectOptions(selectQuarter, "20211");
+
+        expect(submitButton).toBeInTheDocument();
+
+        submitButton.click();
+
+        await waitFor(() => expect(axiosMock.history.post.length).toBe(1));
+
+        expect(axiosMock.history.post[0].url).toBe("/api/jobs/launch/updateCoursesOneQuarter?quarterYYYYQ=20211");
+    });
 
 });
