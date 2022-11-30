@@ -5,12 +5,13 @@ import org.springframework.stereotype.Service;
 
 import edu.ucsb.cs156.courses.collections.ConvertedSectionCollection;
 import edu.ucsb.cs156.courses.services.UCSBCurriculumService;
-import edu.ucsb.cs156.courses.controllers.UCSBSubjectsController;
+import edu.ucsb.cs156.courses.repositories.UCSBSubjectRepository;
 import edu.ucsb.cs156.courses.entities.UCSBSubject;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Iterator;
 
 @Service
 @Slf4j
@@ -23,17 +24,19 @@ public class UpdateCourseDataOneQuarterJobFactory  {
     private ConvertedSectionCollection convertedSectionCollection;
 
     @Autowired
-    private UCSBSubjectsController subjectsController;
+    private UCSBSubjectRepository subjectRepository;
 
     public UpdateCourseDataOneQuarterJob create(String quarterYYYYQ) {
         log.info("ucsbCurriculumService = " + ucsbCurriculumService);
         log.info("convertedSectionCollection = " + convertedSectionCollection);
         List<String> subjects = new ArrayList<String>();
-        Iterable<UCSBSubject> UCSBSubjects = subjectsController.allSubjects();
-        for (UCSBSubject UCSBSubject : UCSBSubjects) {
-            try {
+        Iterable<UCSBSubject> UCSBSubjects = subjectRepository.findAll();
+        Iterator<UCSBSubject> it = UCSBSubjects.iterator();
+        if(it.hasNext()){
+            for (UCSBSubject UCSBSubject : UCSBSubjects)
                 subjects.add(UCSBSubject.getSubjectCode());
-            } catch (Exception e) {}
+        } else{
+            subjects = null;
         }
         return new UpdateCourseDataOneQuarterJob(quarterYYYYQ, ucsbCurriculumService, convertedSectionCollection, subjects);
     }
