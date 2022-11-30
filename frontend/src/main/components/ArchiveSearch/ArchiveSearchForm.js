@@ -23,13 +23,6 @@ const ArchiveSearchForm = ({ fetchJSON }) => {
   const localSubject = localStorage.getItem("ArchiveSearch.Subject");
   const localCourseNumber = localStorage.getItem("ArchiveSearch.CourseNumber");
 
-    // GET Example:
-    // useBackend(
-    //     ["/api/admin/users"],
-    //     { method: "GET", url: "/api/admin/users" },
-    //     []
-    // );
-
   const { data : subjects, error: _error, status: _status } = 
   useBackend(
     // Stryker disable next-line all : don't test internal caching of React Query
@@ -37,7 +30,6 @@ const ArchiveSearchForm = ({ fetchJSON }) => {
     { method : "GET", url: "/api/UCSBSubjects/all"},
     []
   );
-  
 
   const [startQuarter, setStartQuarter] = useState(localStartQuarter || quarters[0].yyyyq);
   const [endQuarter, setEndQuarter] = useState(localEndQuarter || quarters[0].yyyyq);
@@ -100,11 +92,11 @@ const ArchiveSearchForm = ({ fetchJSON }) => {
                 />
                 </Col>
             </Row>
-            <Row style={{ paddingTop: 10, paddingBottom: 10 }}>
-                <Form.Group controlId="CourseNameSearch.CourseNumber">
+            <Form.Group controlId="CourseNameSearch.CourseNumber">
                     <Form.Label>Course Number (Try searching '16' or '130A')</Form.Label>
                     <Form.Control onChange={handleCourseNumberOnChange} defaultValue={courseNumber} />
-                </Form.Group>
+            </Form.Group>
+            <Row style={{ paddingTop: 10, paddingBottom: 10 }}>
                     <Col md="auto">
                         <Button variant="primary" type="submit">
                             Submit
