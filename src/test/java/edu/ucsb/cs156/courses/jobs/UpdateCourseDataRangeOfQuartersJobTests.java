@@ -245,6 +245,62 @@ public class UpdateCourseDataRangeOfQuartersJobTests {
     }
 
     @Test
+    void test_log_output_with_updates_same_year_same_quarter_large() throws Exception {
+
+        // Arrange
+
+        subjects = new ArrayList<String>();
+        subjects.add("ANTH");
+
+        Job jobStarted = Job.builder().build();
+        JobContext ctx = new JobContext(null, jobStarted);
+
+        String coursePageJson = CoursePageFixtures.COURSE_PAGE_JSON_MATH3B;
+        CoursePage coursePage = CoursePage.fromJSON(coursePageJson);
+
+        List<ConvertedSection> convertedSections = coursePage.convertedSections();
+
+        List<ConvertedSection> listWithTwoOrigOneDuplicate = new ArrayList<>();
+
+        ConvertedSection section0 = convertedSections.get(0);
+        ConvertedSection section1 = convertedSections.get(1);
+
+        listWithTwoOrigOneDuplicate.add(section0);
+        listWithTwoOrigOneDuplicate.add(section1);
+        listWithTwoOrigOneDuplicate.add(section0);
+
+        UpdateCourseDataRangeOfQuartersJob updateCourseDataRangeOfQuartersJob = new UpdateCourseDataRangeOfQuartersJob("99991", "99991", ucsbCurriculumService,
+                convertedSectionCollection, subjects);
+
+        Optional<ConvertedSection> section0Optional = Optional.of(section0);
+        Optional<ConvertedSection> emptyOptional = Optional.empty();
+
+        when(ucsbCurriculumService.getConvertedSections(eq("ANTH"), eq("20221"), eq("A")))
+                .thenReturn(listWithTwoOrigOneDuplicate);
+
+
+        when(convertedSectionCollection.findOneByQuarterAndEnrollCode(
+                eq(section0.getCourseInfo().getQuarter()),
+                eq(section0.getSection().getEnrollCode())))
+                .thenReturn(emptyOptional).thenReturn(section0Optional);
+        when(convertedSectionCollection.findOneByQuarterAndEnrollCode(
+                eq(section1.getCourseInfo().getQuarter()),
+                eq(section1.getSection().getEnrollCode())))
+                .thenReturn(emptyOptional);
+        when(convertedSectionCollection.saveAll(any())).thenReturn(null);
+
+        // Act
+
+        updateCourseDataRangeOfQuartersJob.accept(ctx);
+
+        // Assert
+
+        String expected = null;
+
+        assertEquals(expected, jobStarted.getLog());
+    }
+
+    @Test
     void test_log_output_with_updates_year_flipped() throws Exception {
 
         // Arrange

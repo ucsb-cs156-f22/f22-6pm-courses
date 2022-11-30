@@ -80,15 +80,12 @@ public class UpdateCourseDataRangeOfQuartersJobFactoryTests {
         subjects.addAll(Arrays.asList(us1, us2, us3));
 
         
-        Iterable<UCSBSubject> UCSBSubjects = subjects;
         // Act
         
-        UpdateCourseDataRangeOfQuartersJob updateCourseDataRangeOfQuartersJob = updateCourseDataRangeOfQuartersJobFactory.create("20221", "20222");
-
+        
         when(ucsbSubjectRepository.findAll()).thenReturn(subjects);
         
-         when(subjectsController.allSubjects())
-              .thenReturn(UCSBSubjects);
+        UpdateCourseDataRangeOfQuartersJob updateCourseDataRangeOfQuartersJob = updateCourseDataRangeOfQuartersJobFactory.create("20221", "20222");
 
         // Assert
 

@@ -5,9 +5,9 @@ import org.springframework.stereotype.Service;
 
 import edu.ucsb.cs156.courses.collections.ConvertedSectionCollection;
 import edu.ucsb.cs156.courses.services.UCSBCurriculumService;
-import edu.ucsb.cs156.courses.controllers.UCSBSubjectsController;
+//import edu.ucsb.cs156.courses.controllers.UCSBSubjectsController;
 import edu.ucsb.cs156.courses.entities.UCSBSubject;
-//import edu.ucsb.cs156.courses.repositories.UCSBSubjectRepository;
+import edu.ucsb.cs156.courses.repositories.UCSBSubjectRepository;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.ArrayList;
@@ -24,14 +24,14 @@ public class UpdateCourseDataRangeOfQuartersJobFactory  {
     private ConvertedSectionCollection convertedSectionCollection;
 
     @Autowired
-    private UCSBSubjectsController subjectsController;
+    private UCSBSubjectRepository subjectRepository;
 
     public UpdateCourseDataRangeOfQuartersJob create(String start_quarterYYYYQ, String end_quarterYYYYQ) {
         log.info("ucsbCurriculumService = " + ucsbCurriculumService);
         log.info("convertedSectionCollection = " + convertedSectionCollection);
 
         List<String> subjects = new ArrayList<String>();
-        Iterable<UCSBSubject> UCSBSubjects = subjectsController.allSubjects();
+        Iterable<UCSBSubject> UCSBSubjects = subjectRepository.findAll();
         for (UCSBSubject UCSBSubject : UCSBSubjects) {
             subjects.add(UCSBSubject.getSubjectCode());
         }
