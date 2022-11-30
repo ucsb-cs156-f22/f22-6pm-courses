@@ -32,7 +32,7 @@ const UpdateCoursesJobForm = ({ callback }) => {
   );
 
   const [quarter, setQuarter] = useState(localQuarter || quarters[0].yyyyq);
-  const [subject, setSubject] = useState(localSubject || "ART");
+  const [subject, setSubject] = useState(localSubject || "ANTH");
 
   const handleSubmit = (event) => {
     event.preventDefault();
