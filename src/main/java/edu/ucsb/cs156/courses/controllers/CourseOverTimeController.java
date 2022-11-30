@@ -33,14 +33,14 @@ public class CourseOverTimeController {
 
     @GetMapping(value = "/search", produces = "application/json")
     public ResponseEntity<String> search(
-        @RequestParam String startQtr,
-        @RequestParam String endQtr,
+        @RequestParam String startQuarter,
+        @RequestParam String endQuarter,
         @RequestParam String subject,
         @RequestParam String number) 
         
         throws JsonProcessingException {
 
-        List<ConvertedSection> course = convertedSectionCollection.findCourseOverTime(startQtr,endQtr,makeFormattedCourseId(subject, number));
+        List<ConvertedSection> course = convertedSectionCollection.findCourseOverTime(startQuarter,endQuarter,makeFormattedCourseId(subject, number));
         String body = mapper.writeValueAsString(course);
         return ResponseEntity.ok().body(body);
     }
