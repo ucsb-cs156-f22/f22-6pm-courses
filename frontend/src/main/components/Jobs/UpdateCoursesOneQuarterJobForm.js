@@ -5,8 +5,6 @@ import { quarterRange } from "main/utils/quarterUtilities";
 
 import { useSystemInfo } from "main/utils/systemInfo";
 import SingleQuarterDropdown from "../Quarters/SingleQuarterDropdown";
-import SingleSubjectDropdown from "../Subjects/SingleSubjectDropdown";
-import { useBackend  } from "main/utils/useBackend";
 
 const UpdateCoursesJobForm = ({ callback }) => {
 
@@ -47,7 +45,7 @@ const UpdateCoursesJobForm = ({ callback }) => {
         <Row style={{ paddingTop: 10, paddingBottom: 10 }}>
           <Col md="auto">
             <Button variant="primary" type="submit">
-              Update Courses
+              Update All Courses
             </Button>
           </Col>
         </Row>

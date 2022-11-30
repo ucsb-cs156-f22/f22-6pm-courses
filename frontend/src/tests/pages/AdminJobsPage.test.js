@@ -136,7 +136,7 @@ describe("AdminJobsPage tests", () => {
 
         expect(await screen.findByTestId("TestJobForm-fail")).toBeInTheDocument();
 
-        const submitButton = screen.getByText("Update Courses");
+        const submitButton = screen.getByText("Update All Courses");
     
         const selectQuarter = screen.getByLabelText("Quarter");
         userEvent.selectOptions(selectQuarter, "20211");

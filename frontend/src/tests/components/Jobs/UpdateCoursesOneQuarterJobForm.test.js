@@ -29,7 +29,7 @@ describe("UpdateCoursesOneQuarterJobForm tests", () => {
       </QueryClientProvider>
     );
 
-    expect(screen.getByText(/Update Courses/)).toBeInTheDocument();
+    expect(screen.getByText(/Update All Courses/)).toBeInTheDocument();
   });
 
   test("renders without crashing when fallback values are used", async () => {
