@@ -36,6 +36,7 @@ import edu.ucsb.cs156.courses.ControllerTestCase;
 import edu.ucsb.cs156.courses.collections.ConvertedSectionCollection;
 import edu.ucsb.cs156.courses.entities.User;
 import edu.ucsb.cs156.courses.jobs.UpdateCourseDataJobFactory;
+import edu.ucsb.cs156.courses.jobs.UpdateCourseDataRangeOfQuartersJobFactory;
 import edu.ucsb.cs156.courses.entities.Job;
 import edu.ucsb.cs156.courses.repositories.UserRepository;
 import edu.ucsb.cs156.courses.repositories.JobsRepository;
@@ -68,6 +69,9 @@ public class JobsControllerTests extends ControllerTestCase {
     UpdateCourseDataJobFactory updateCourseDataJobFactory;
 
     @MockBean
+    UpdateCourseDataRangeOfQuartersJobFactory updateCourseDataRangeOfQuartersJobFactory;
+
+    @MockBean
     ConvertedSectionCollection convertedSectionCollection;
 
     @WithMockUser(roles = { "ADMIN" })
@@ -78,9 +82,10 @@ public class JobsControllerTests extends ControllerTestCase {
 
         Job job1 = Job.builder().log("this is job 1").build();
         Job job2 = Job.builder().log("this is job 2").build();
+        Job job3 = Job.builder().log("this is job 3").build();
 
         ArrayList<Job> expectedJobs = new ArrayList<>();
-        expectedJobs.addAll(Arrays.asList(job1, job2));
+        expectedJobs.addAll(Arrays.asList(job1, job2, job3));
 
         when(jobsRepository.findAll()).thenReturn(expectedJobs);
 
@@ -189,6 +194,21 @@ public class JobsControllerTests extends ControllerTestCase {
     public void admin_can_launch_update_courses_job() throws Exception {
         // act
         MvcResult response = mockMvc.perform(post("/api/jobs/launch/updateCourses?quarterYYYYQ=20231&subjectArea=CMPSC").with(csrf()))
+                .andExpect(status().isOk()).andReturn();
+
+        // assert
+        String responseString = response.getResponse().getContentAsString();
+        log.info("responseString={}", responseString);
+        Job jobReturned = objectMapper.readValue(responseString, Job.class);
+
+        assertNotNull(jobReturned.getStatus());
+    }
+
+    @WithMockUser(roles = { "ADMIN" })
+    @Test
+    public void admin_can_launch_update_courses_range_of_quarters_job() throws Exception {
+        // act
+        MvcResult response = mockMvc.perform(post("/api/jobs/launch/updateCoursesRangeOfQuarters?start_quarterYYYYQ=20221&end_quarterYYYYQ=20222").with(csrf()))
                 .andExpect(status().isOk()).andReturn();
 
         // assert
