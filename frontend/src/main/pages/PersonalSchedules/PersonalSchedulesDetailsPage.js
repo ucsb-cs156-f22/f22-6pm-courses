@@ -1,6 +1,7 @@
 import BasicLayout from "main/layouts/BasicLayout/BasicLayout";
 import { useParams } from "react-router-dom";
 import PersonalSchedulesTable from 'main/components/PersonalSchedules/PersonalSchedulesTable';
+import PersonalSectionsTable from 'main/components/PersonalSections/PersonalSectionsTable'
 import { useBackend, _useBackendMutation } from "main/utils/useBackend";
 
 
