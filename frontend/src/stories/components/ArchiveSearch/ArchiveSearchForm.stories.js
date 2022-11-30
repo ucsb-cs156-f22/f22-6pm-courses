@@ -8,7 +8,7 @@ export default {
     title: "components/ArchiveSearch/ArchiveSearchForm",
     component: ArchiveSearchForm,
     parameters: {
-        data: [
+        mockData: [
             {
                 url: "/api/UCSBSubjects/all",
                 method: "GET",
