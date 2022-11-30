@@ -20,7 +20,19 @@ export default function PersonalSchedulesDetailsPage() {
         }
       }
     );
-
+    
+  const { data: personalSection} =
+    useBackend(
+        // Stryker disable all : hard to test for query caching
+      [`/api/personalSections/all?psId=${id}`],{
+          method: "GET",
+          url: `/api/personalSections/all?psId=${id}`,
+          params: {
+            id
+          }
+      }
+    );
+      
   return (
     <BasicLayout>
       <div className="pt-2">
