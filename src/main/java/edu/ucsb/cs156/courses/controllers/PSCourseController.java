@@ -224,24 +224,26 @@ public class PSCourseController extends ApiController {
                   break;
               }
           }
-          String output;
+          String output = "";
           if (!hasSecondary) { 
               coursesRepository.delete(course);
               return genericMessage("PSCourse with id %s deleted".formatted(id));
           }
+          PSCourse primaryCourse = coursesRepository.findById(primaryId).get();
+          coursesRepository.delete(primaryCourse);
           if (enrollmentCode.equals(primaryCode)) {
               Iterator<JsonNode> allSections2 = mapper.readTree(body).path("classSections").elements();
               Iterable<PSCourse> currentCourses = thisUsersCoursesForPsId(course.getPsId());
               boolean done = false;
-              while (allSections2.hasNext() && !done) {
+              while (!done) {
                 JsonNode node2 = allSections2.next();
                 String sectionCodes = node2.path("enrollCode").asText();
                 if (!sectionCodes.equals(primaryCode)){
                     for (PSCourse psc: currentCourses) {
                         if (psc.getEnrollCd().equals(sectionCodes)) {
+                            log.info("banana");
                             secondaryId = psc.getId();
                             done = true;
-                            break;
                         }
                     }
                 }
@@ -250,9 +252,7 @@ public class PSCourseController extends ApiController {
           } else {
             output = "PSCourse with id %s and matching primary with id %s deleted".formatted(secondaryId, primaryId);
           }
-        PSCourse primaryCourse = coursesRepository.findById(primaryId).get();
         PSCourse secondaryCourse = coursesRepository.findById(secondaryId).get();
-        coursesRepository.delete(primaryCourse);
         coursesRepository.delete(secondaryCourse);
         return genericMessage(output);
     }

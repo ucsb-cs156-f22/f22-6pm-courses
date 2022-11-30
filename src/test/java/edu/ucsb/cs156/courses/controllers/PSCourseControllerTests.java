@@ -580,6 +580,8 @@ public class PSCourseControllerTests extends ControllerTestCase {
         when(coursesRepository.findByIdAndUser(eq(18L), eq(u))).thenReturn(Optional.of(expectedSection));
         when(coursesRepository.findById(eq(18L))).thenReturn(Optional.of(expectedSection));
 
+        PSCourse expectedCourses = PSCourse.builder().enrollCd("08268").psId(2L).user(u).id(19L).build();
+
         when(ucsbCurriculumService.getAllSections(eq("58891"), eq("20224"))).thenReturn(SectionFixtures.SECTION_JSON_CMPSC156);
         
         ArrayList<PSCourse> expectedResponse = new ArrayList<>();
