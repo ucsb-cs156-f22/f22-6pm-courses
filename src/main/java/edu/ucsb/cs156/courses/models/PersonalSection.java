@@ -15,11 +15,10 @@ import edu.ucsb.cs156.courses.documents.Section;
 @Data
 @Builder
 @AllArgsConstructor
-@NoArgsConstructor //(access = AccessLevel.PROTECTED)
+@NoArgsConstructor
 public class PersonalSection {
     private PSCourse psCourse;
     private PersonalSchedule personalSchedule;
     private CourseInfo courseInfo;
     private Section section;
-    //private Collection<? extends GrantedAuthority> roles;
 }
