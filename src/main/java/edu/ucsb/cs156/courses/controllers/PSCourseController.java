@@ -241,7 +241,6 @@ public class PSCourseController extends ApiController {
                 if (!sectionCodes.equals(primaryCode)){
                     for (PSCourse psc: currentCourses) {
                         if (psc.getEnrollCd().equals(sectionCodes)) {
-                            log.info("banana");
                             secondaryId = psc.getId();
                             done = true;
                         }
