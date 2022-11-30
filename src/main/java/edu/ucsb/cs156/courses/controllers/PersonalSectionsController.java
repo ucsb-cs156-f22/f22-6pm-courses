@@ -5,11 +5,13 @@ import edu.ucsb.cs156.courses.entities.PSCourse;
 import edu.ucsb.cs156.courses.entities.User;
 import edu.ucsb.cs156.courses.errors.EntityNotFoundException;
 import edu.ucsb.cs156.courses.models.CurrentUser;
+import edu.ucsb.cs156.courses.models.PersonalSection;
 import edu.ucsb.cs156.courses.repositories.PersonalScheduleRepository;
 import edu.ucsb.cs156.courses.repositories.PSCourseRepository;
 import edu.ucsb.cs156.courses.services.UCSBCurriculumService;
 import edu.ucsb.cs156.courses.documents.Course;
 import edu.ucsb.cs156.courses.documents.CourseInfo;
+import edu.ucsb.cs156.courses.documents.Section;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -76,6 +78,27 @@ public class PersonalSectionsController extends ApiController {
 
         }
         return sections;
+    }
+
+    @ApiOperation(value = "List all sections for all psId")
+    @PreAuthorize("hasRole('ROLE_USER')")
+    @GetMapping(value = "/user/all", produces = "application/json")
+    public Iterable<PersonalSection> allSections(){
+        Iterable<PSCourse> courses = coursesRepository.findAll();
+        Iterable<PersonalSection> personal = sectionsRepository.findAll();
+        ArrayList<String> jsons = new ArrayList<String>();
+        for (PSCourse crs:courses) {
+                User us = getCurrentUser().getUser();
+                PersonalSchedule ps = personalScheduleRepository.findByUser(us)
+                    .orElseThrow(() -> new EntityNotFoundException(PersonalSchedule.class, us));
+                String qtr = ps.getQuarter();
+                String responseBody = ucsbCurriculumService.getJSONbyQtrEnrollCd(qtr, crs.getEnrollCd());
+                jsons.add(responseBody);
+                CourseInfo courseInfo = objectMapper.readValue(responseBody, CourseInfo.class);
+                Section section = new Section();
+                PersonalSection personalSection = new PersonalSection(crs, ps, courseInfo, section);
+        }
+        return personal;
     }
 
 }
