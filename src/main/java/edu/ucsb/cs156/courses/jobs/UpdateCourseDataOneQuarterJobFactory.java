@@ -30,8 +30,11 @@ public class UpdateCourseDataOneQuarterJobFactory  {
         log.info("convertedSectionCollection = " + convertedSectionCollection);
         List<String> subjects = new ArrayList<String>();
         Iterable<UCSBSubject> UCSBSubjects = subjectsController.allSubjects();
-        for (UCSBSubject UCSBSubject : UCSBSubjects) 
-            subjects.add(UCSBSubject.getSubjectCode());
+        for (UCSBSubject UCSBSubject : UCSBSubjects) {
+            try {
+                subjects.add(UCSBSubject.getSubjectCode());
+            } catch (Exception e) {}
+        }
         return new UpdateCourseDataOneQuarterJob(quarterYYYYQ, ucsbCurriculumService, convertedSectionCollection, subjects);
     }
 }
