@@ -65,7 +65,7 @@ describe("PersonalSchedulesDetailsPage tests", () => {
         );
     });
 
-    test("shows the correct info for admin users", async() => {
+    test("shows the correct info for admin users with section info", async() => {
         setupAdminUser();
         const queryClient = new QueryClient();
         axiosMock.onGet(`/api/personalschedules?id=17`).reply(200, {
@@ -88,7 +88,54 @@ describe("PersonalSchedulesDetailsPage tests", () => {
                 "name": "CS156"
               
         });
+        axiosMock.onGet('/api/personalSections/all?psId=17').reply(200, [
+            {
+              "quarter": "20221",
+              "courseId": "ECE      15A ",
+              "title": "FUND OF LOGIC DES",
+              "description": "Boolean algebra, logic of propositions, minterm and maxterm   expansions, Karnaugh maps, Quine-McCluskey method, melti-level circuits, combinational   circuit design and simulation, multiplexers, decoders, programmable logic   devices.",
+              "classSections": [
+                {
+                  "enrollCode": "12815",
+                  "section": "0107",
+                  "session": null,
+                  "classClosed": null,
+                  "courseCancelled": null,
+                  "gradingOptionCode": null,
+                  "enrolledTotal": 23,
+                  "maxEnroll": 23,
+                  "secondaryStatus": null,
+                  "departmentApprovalRequired": false,
+                  "instructorApprovalRequired": false,
+                  "restrictionLevel": null,
+                  "restrictionMajor": "+EE   +ECE  +CMPEN+PRCME",
+                  "restrictionMajorPass": null,
+                  "restrictionMinor": null,
+                  "restrictionMinorPass": null,
+                  "concurrentCourses": [],
+                  "timeLocations": [
+                    {
+                      "room": "1231",
+                      "building": "HSSB",
+                      "roomCapacity": "26",
+                      "days": "    F  ",
+                      "beginTime": "10:00",
+                      "endTime": "10:50"
+                    }
+                  ],
+                  "instructors": [
+                    {
+                      "instructor": "CHEN ZHUOTONG",
+                      "functionCode": "Teaching but not in charge"
+                    }
+                  ]
+                }
+              ],
+              "generalEducation": [],
+              "finalExam": null
+            },
 
+          ]);
         render(
             <QueryClientProvider client={queryClient}>
                 <MemoryRouter>
