@@ -42,30 +42,34 @@ public class UpdateCourseDataRangeOfQuartersJob implements JobContextConsumer {
 
         int end_year = year2;
         int end_qtr = qtr2;
-
+    
         //case 1
         if(year1 > year2){
-            current_year = year2;
-            current_qtr = qtr2;
+            return;
+            // current_year = year2;
+            // current_qtr = qtr2;
 
-            end_year = year1;
-            end_qtr = qtr1;
+            // end_year = year1;
+            // end_qtr = qtr1;
         }
 
         //case 2
         if(year1 == year2) {
-            current_year = year1;
-            end_year = year2;
 
-            if(qtr1 < qtr2){
-                current_qtr = qtr1;
-                end_qtr = qtr2;
-            } else {
-                current_qtr = qtr2;
-                end_qtr = qtr1;
+            if(qtr1 > qtr2) {
+                return;
             }
-        }
+            // current_year = year1;
+            // end_year = year2;
 
+            // if(qtr1 <= qtr2){
+            //     current_qtr = qtr1;
+            //     end_qtr = qtr2;
+            // } else {
+            //     current_qtr = qtr2;
+            //     end_qtr = qtr1;
+            // }
+        }
         for(int c_year = current_year; c_year < 9999; c_year++) {
             for(int c_qtr = current_qtr; c_qtr<=4; c_qtr++){
                 String quarterYYYYQ = String.valueOf(c_year) + String.valueOf(c_qtr);

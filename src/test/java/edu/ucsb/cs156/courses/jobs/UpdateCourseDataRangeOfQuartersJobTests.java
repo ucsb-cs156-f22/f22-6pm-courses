@@ -1,4 +1,4 @@
-package edu.ucsb.cs156.courses.jobs;
+ package edu.ucsb.cs156.courses.jobs;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
@@ -46,6 +46,7 @@ public class UpdateCourseDataRangeOfQuartersJobTests {
 
     @Mock
     List<String> subjects;
+
 
     @Test
     void test_log_output_success() throws Exception {
@@ -115,6 +116,8 @@ public class UpdateCourseDataRangeOfQuartersJobTests {
                 Courses for [ANTH 20222] have been updated""";
 
         assertEquals(expected, jobStarted.getLog());
+        //assertEquals(subjects,updateCourseDataRangeOfQuartersJob.getSubjects());
+
     }
 
     @Test
@@ -245,6 +248,129 @@ public class UpdateCourseDataRangeOfQuartersJobTests {
     }
 
     @Test
+    void test_log_output_with_updates_same_year_start_bigger_than_end() throws Exception {
+
+        // Arrange
+
+        subjects = new ArrayList<String>();
+        subjects.add("ANTH");
+
+        Job jobStarted = Job.builder().build();
+        JobContext ctx = new JobContext(null, jobStarted);
+
+        String coursePageJson = CoursePageFixtures.COURSE_PAGE_JSON_MATH3B;
+        CoursePage coursePage = CoursePage.fromJSON(coursePageJson);
+
+        List<ConvertedSection> convertedSections = coursePage.convertedSections();
+
+        List<ConvertedSection> listWithTwoOrigOneDuplicate = new ArrayList<>();
+
+        ConvertedSection section0 = convertedSections.get(0);
+        ConvertedSection section1 = convertedSections.get(1);
+
+        listWithTwoOrigOneDuplicate.add(section0);
+        listWithTwoOrigOneDuplicate.add(section1);
+        listWithTwoOrigOneDuplicate.add(section0);
+
+        UpdateCourseDataRangeOfQuartersJob updateCourseDataRangeOfQuartersJob = new UpdateCourseDataRangeOfQuartersJob("20222", "20221", ucsbCurriculumService,
+                convertedSectionCollection, subjects);
+
+        Optional<ConvertedSection> section0Optional = Optional.of(section0);
+        Optional<ConvertedSection> emptyOptional = Optional.empty();
+
+        when(ucsbCurriculumService.getConvertedSections(eq("ANTH"), eq("20221"), eq("A")))
+                .thenReturn(listWithTwoOrigOneDuplicate);
+
+
+        when(convertedSectionCollection.findOneByQuarterAndEnrollCode(
+                eq(section0.getCourseInfo().getQuarter()),
+                eq(section0.getSection().getEnrollCode())))
+                .thenReturn(emptyOptional).thenReturn(section0Optional);
+        when(convertedSectionCollection.findOneByQuarterAndEnrollCode(
+                eq(section1.getCourseInfo().getQuarter()),
+                eq(section1.getSection().getEnrollCode())))
+                .thenReturn(emptyOptional);
+        when(convertedSectionCollection.saveAll(any())).thenReturn(null);
+
+        // Act
+
+        updateCourseDataRangeOfQuartersJob.accept(ctx);
+
+        // Assert
+
+        String expected = null;
+
+        assertEquals(expected, jobStarted.getLog());
+    }
+
+
+    @Test
+    void test_log_output_with_updates_qtr_reset() throws Exception {
+
+        // Arrange
+
+        subjects = new ArrayList<String>();
+        subjects.add("ANTH");
+
+        Job jobStarted = Job.builder().build();
+        JobContext ctx = new JobContext(null, jobStarted);
+
+        String coursePageJson = CoursePageFixtures.COURSE_PAGE_JSON_MATH3B;
+        CoursePage coursePage = CoursePage.fromJSON(coursePageJson);
+
+        List<ConvertedSection> convertedSections = coursePage.convertedSections();
+
+        List<ConvertedSection> listWithTwoOrigOneDuplicate = new ArrayList<>();
+
+        ConvertedSection section0 = convertedSections.get(0);
+        ConvertedSection section1 = convertedSections.get(1);
+
+        listWithTwoOrigOneDuplicate.add(section0);
+        listWithTwoOrigOneDuplicate.add(section1);
+        listWithTwoOrigOneDuplicate.add(section0);
+
+        UpdateCourseDataRangeOfQuartersJob updateCourseDataRangeOfQuartersJob = new UpdateCourseDataRangeOfQuartersJob("20224", "20231", ucsbCurriculumService,
+                convertedSectionCollection, subjects);
+
+        Optional<ConvertedSection> section0Optional = Optional.of(section0);
+        Optional<ConvertedSection> emptyOptional = Optional.empty();
+
+        when(ucsbCurriculumService.getConvertedSections(eq("ANTH"), eq("20224"), eq("A")))
+                .thenReturn(listWithTwoOrigOneDuplicate);
+
+
+        when(convertedSectionCollection.findOneByQuarterAndEnrollCode(
+                eq(section0.getCourseInfo().getQuarter()),
+                eq(section0.getSection().getEnrollCode())))
+                .thenReturn(emptyOptional).thenReturn(section0Optional);
+        when(convertedSectionCollection.findOneByQuarterAndEnrollCode(
+                eq(section1.getCourseInfo().getQuarter()),
+                eq(section1.getSection().getEnrollCode())))
+                .thenReturn(emptyOptional);
+        when(convertedSectionCollection.saveAll(any())).thenReturn(null);
+
+        // Act
+
+        updateCourseDataRangeOfQuartersJob.accept(ctx);
+
+        // Assert
+
+        String expected = """
+                Updating courses for [ANTH 20224]
+                Found 3 sections
+                Storing in MongoDB Collection...
+                2 new sections saved, 1 sections updated, 0 errors
+                Courses for [ANTH 20224] have been updated
+                Updating courses for [ANTH 20231]
+                Found 0 sections
+                Storing in MongoDB Collection...
+                0 new sections saved, 0 sections updated, 0 errors
+                Courses for [ANTH 20231] have been updated""";
+
+        assertEquals(expected, jobStarted.getLog());
+    }
+
+    @Test
     void test_log_output_with_updates_same_year_same_quarter_large() throws Exception {
 
         // Arrange
@@ -351,37 +477,7 @@ public class UpdateCourseDataRangeOfQuartersJobTests {
 
         // Assert
 
-        String expected = """
-                Updating courses for [ANTH 20211]
-                Found 3 sections
-                Storing in MongoDB Collection...
-                2 new sections saved, 1 sections updated, 0 errors
-                Courses for [ANTH 20211] have been updated
-                Updating courses for [ANTH 20212]
-                Found 0 sections
-                Storing in MongoDB Collection...
-                0 new sections saved, 0 sections updated, 0 errors
-                Courses for [ANTH 20212] have been updated
-                Updating courses for [ANTH 20213]
-                Found 0 sections
-                Storing in MongoDB Collection...
-                0 new sections saved, 0 sections updated, 0 errors
-                Courses for [ANTH 20213] have been updated
-                Updating courses for [ANTH 20214]
-                Found 0 sections
-                Storing in MongoDB Collection...
-                0 new sections saved, 0 sections updated, 0 errors
-                Courses for [ANTH 20214] have been updated
-                Updating courses for [ANTH 20221]
-                Found 0 sections
-                Storing in MongoDB Collection...
-                0 new sections saved, 0 sections updated, 0 errors
-                Courses for [ANTH 20221] have been updated
-                Updating courses for [ANTH 20222]
-                Found 0 sections
-                Storing in MongoDB Collection...
-                0 new sections saved, 0 sections updated, 0 errors
-                Courses for [ANTH 20222] have been updated""";
+        String expected = null;
 
         assertEquals(expected, jobStarted.getLog());
     }

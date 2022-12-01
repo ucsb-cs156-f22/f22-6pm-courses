@@ -79,6 +79,12 @@ public class UpdateCourseDataRangeOfQuartersJobFactoryTests {
         ArrayList<UCSBSubject> subjects = new ArrayList<>();
         subjects.addAll(Arrays.asList(us1, us2, us3));
 
+        ArrayList<String> expectedSubjects = new ArrayList<>();
+        
+        for(UCSBSubject subject: subjects) {
+                expectedSubjects.add(subject.getSubjectCode());
+        }
+
         
         // Act
         
@@ -93,7 +99,7 @@ public class UpdateCourseDataRangeOfQuartersJobFactoryTests {
         assertEquals("20222",updateCourseDataRangeOfQuartersJob.getEnd_quarterYYYYQ());
         assertEquals(ucsbCurriculumService,updateCourseDataRangeOfQuartersJob.getUcsbCurriculumService());
         assertEquals(convertedSectionCollection,updateCourseDataRangeOfQuartersJob.getConvertedSectionCollection());
-        //assertEquals(subjects,updateCourseDataRangeOfQuartersJob.getSubjects());
+        assertEquals(expectedSubjects,updateCourseDataRangeOfQuartersJob.getSubjects());
 
     }
 }
