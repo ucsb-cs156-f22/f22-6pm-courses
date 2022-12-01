@@ -15,7 +15,6 @@ import PersonalSchedulesCreatePage from "main/pages/PersonalSchedules/PersonalSc
 import PersonalSchedulesEditPage from "main/pages/PersonalSchedules/PersonalSchedulesEditPage";
 
 import PersonalSchedulesDetailsPage from "main/pages/PersonalSchedules/PersonalSchedulesDetailsPage";
-import SectionSearchesIndexPage from "main/pages/SectionSearches/SectionSearchesIndexPage";
 
 import CoursesIndexPage from "main/pages/Courses/PSCourseIndexPage";
 import CoursesCreatePage from "main/pages/Courses/PSCourseCreatePage";
@@ -54,7 +53,6 @@ function App() {
             </>
           )
         }
-        <Route exact path="/sectionsearches/search" element={<SectionSearchesIndexPage />} />
         <Route exact path="/coursesearches/search" element={<CourseSearchesIndexPage />} />
       </Routes>
     </BrowserRouter>

@@ -191,12 +191,69 @@ public class PSCourseController extends ApiController {
     @PreAuthorize("hasRole('ROLE_USER')")
     @DeleteMapping("/user")
     public Object deleteCourses(
-            @ApiParam("id") @RequestParam Long id) {
+            @ApiParam("id") @RequestParam Long id) throws JsonProcessingException {
         User currentUser = getCurrentUser().getUser();
-        PSCourse courses = coursesRepository.findByIdAndUser(id, currentUser)
+        PSCourse course = coursesRepository.findByIdAndUser(id, currentUser)
           .orElseThrow(() -> new EntityNotFoundException(PSCourse.class, id));
-        coursesRepository.delete(courses);
-        return genericMessage("PSCourse with id %s deleted".formatted(id));
+          String enrollmentCode = course.getEnrollCd();
+
+          PersonalSchedule checkPsId = personalScheduleRepository.findByIdAndUser(course.getPsId(), currentUser)
+          .orElseThrow(() -> new EntityNotFoundException(PersonalSchedule.class, course.getPsId()));
+  
+          String body = ucsbCurriculumService.getAllSections(enrollmentCode, checkPsId.getQuarter());
+  
+          Long primaryId = id;
+          Long secondaryId = id;
+          String primaryCode = null;
+          boolean hasSecondary = false;
+          Iterator<JsonNode> allSections = mapper.readTree(body).path("classSections").elements();
+          while (allSections.hasNext()) {
+              JsonNode node = allSections.next();
+              String section = node.path("section").asText();
+              if (section.endsWith("00")) {
+                  primaryCode = node.path("enrollCode").asText();
+                  Iterable<PSCourse> userCourses = thisUsersCoursesForPsId(course.getPsId());
+                  for (PSCourse psc: userCourses) {
+                      if (psc.getEnrollCd().equals(primaryCode)) {
+                          primaryId = psc.getId();
+                      }
+                  }
+              }
+              else {
+                  hasSecondary = true;
+                  break;
+              }
+          }
+          String output = "";
+          if (!hasSecondary) { 
+              coursesRepository.delete(course);
+              return genericMessage("PSCourse with id %s deleted".formatted(id));
+          }
+          PSCourse primaryCourse = coursesRepository.findById(primaryId).get();
+          coursesRepository.delete(primaryCourse);
+          if (enrollmentCode.equals(primaryCode)) {
+              Iterator<JsonNode> allSections2 = mapper.readTree(body).path("classSections").elements();
+              Iterable<PSCourse> currentCourses = thisUsersCoursesForPsId(course.getPsId());
+              boolean done = false;
+              while (!done) {
+                JsonNode node2 = allSections2.next();
+                String sectionCodes = node2.path("enrollCode").asText();
+                if (!sectionCodes.equals(primaryCode)){
+                    for (PSCourse psc: currentCourses) {
+                        if (psc.getEnrollCd().equals(sectionCodes)) {
+                            secondaryId = psc.getId();
+                            done = true;
+                        }
+                    }
+                }
+              }
+              output = "PSCourse with id %s and matching secondary with id %s deleted".formatted(primaryId, secondaryId);
+          } else {
+            output = "PSCourse with id %s and matching primary with id %s deleted".formatted(secondaryId, primaryId);
+          }
+        PSCourse secondaryCourse = coursesRepository.findById(secondaryId).get();
+        coursesRepository.delete(secondaryCourse);
+        return genericMessage(output);
     }
 
     @ApiOperation(value = "Update a single Course (admin)")
