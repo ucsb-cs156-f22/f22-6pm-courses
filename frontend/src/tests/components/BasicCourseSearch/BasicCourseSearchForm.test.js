@@ -89,6 +89,8 @@ describe("BasicCourseSearchForm tests", () => {
     expect(selectSubject.value).toBe("MATH");
   });
 
+  
+
   test("when I select a level, the state for level changes", () => {
     render(
       <QueryClientProvider client={queryClient}>
