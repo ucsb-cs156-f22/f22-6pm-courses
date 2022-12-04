@@ -102,10 +102,8 @@ public class UpdateCourseDataRangeOfQuartersJob implements JobContextConsumer {
                     return;
                 }
 
-                //current_qtr++;
 
                 if(c_qtr == 4){
-                    //current_year++;
                     current_qtr = 1;
                 }
             }
