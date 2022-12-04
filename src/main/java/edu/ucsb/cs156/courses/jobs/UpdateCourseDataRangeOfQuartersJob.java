@@ -6,8 +6,6 @@ import java.util.Optional;
 
 import edu.ucsb.cs156.courses.collections.ConvertedSectionCollection;
 import edu.ucsb.cs156.courses.documents.ConvertedSection;
-//import edu.ucsb.cs156.courses.entities.UCSBSubject;
-//import edu.ucsb.cs156.courses.models.Quarter;
 import edu.ucsb.cs156.courses.services.UCSBCurriculumService;
 import edu.ucsb.cs156.courses.services.jobs.JobContext;
 import edu.ucsb.cs156.courses.services.jobs.JobContextConsumer;
@@ -46,11 +44,6 @@ public class UpdateCourseDataRangeOfQuartersJob implements JobContextConsumer {
         //case 1
         if(year1 > year2){
             return;
-            // current_year = year2;
-            // current_qtr = qtr2;
-
-            // end_year = year1;
-            // end_qtr = qtr1;
         }
 
         //case 2
@@ -59,16 +52,6 @@ public class UpdateCourseDataRangeOfQuartersJob implements JobContextConsumer {
             if(qtr1 > qtr2) {
                 return;
             }
-            // current_year = year1;
-            // end_year = year2;
-
-            // if(qtr1 <= qtr2){
-            //     current_qtr = qtr1;
-            //     end_qtr = qtr2;
-            // } else {
-            //     current_qtr = qtr2;
-            //     end_qtr = qtr1;
-            // }
         }
         for(int c_year = current_year; c_year < 9999; c_year++) {
             for(int c_qtr = current_qtr; c_qtr<=4; c_qtr++){

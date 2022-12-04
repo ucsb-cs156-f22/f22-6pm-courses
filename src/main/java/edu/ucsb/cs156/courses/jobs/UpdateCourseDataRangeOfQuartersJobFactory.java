@@ -5,7 +5,6 @@ import org.springframework.stereotype.Service;
 
 import edu.ucsb.cs156.courses.collections.ConvertedSectionCollection;
 import edu.ucsb.cs156.courses.services.UCSBCurriculumService;
-//import edu.ucsb.cs156.courses.controllers.UCSBSubjectsController;
 import edu.ucsb.cs156.courses.entities.UCSBSubject;
 import edu.ucsb.cs156.courses.repositories.UCSBSubjectRepository;
 import lombok.extern.slf4j.Slf4j;
