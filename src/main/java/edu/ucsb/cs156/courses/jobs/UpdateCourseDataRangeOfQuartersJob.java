@@ -6,6 +6,7 @@ import java.util.Optional;
 
 import edu.ucsb.cs156.courses.collections.ConvertedSectionCollection;
 import edu.ucsb.cs156.courses.documents.ConvertedSection;
+import edu.ucsb.cs156.courses.models.Quarter;
 import edu.ucsb.cs156.courses.services.UCSBCurriculumService;
 import edu.ucsb.cs156.courses.services.jobs.JobContext;
 import edu.ucsb.cs156.courses.services.jobs.JobContextConsumer;
@@ -27,7 +28,7 @@ public class UpdateCourseDataRangeOfQuartersJob implements JobContextConsumer {
     @Override
     public void accept(JobContext ctx) throws Exception {
 
-
+/*
         int year1 = Integer.parseInt(start_quarterYYYYQ.substring(0,4));
         int qtr1 = Integer.parseInt(start_quarterYYYYQ.substring(4));
 
@@ -53,59 +54,49 @@ public class UpdateCourseDataRangeOfQuartersJob implements JobContextConsumer {
                 return;
             }
         }
-        for(int c_year = current_year; c_year < 9999; c_year++) {
-            for(int c_qtr = current_qtr; c_qtr<=4; c_qtr++){
-                String quarterYYYYQ = String.valueOf(c_year) + String.valueOf(c_qtr);
-                for (String subjectArea : subjects) {
-                    ctx.log("Updating courses for [" + subjectArea + " " + quarterYYYYQ + "]");
+    */
+        List<Quarter> quarters = Quarter.quarterList(Quarter.yyyyqToQyy(Integer.parseInt(start_quarterYYYYQ)), Quarter.yyyyqToQyy(Integer.parseInt(end_quarterYYYYQ)));
+        for(Quarter quarter : quarters) {
+            String quarterYYYYQ = quarter.getYYYYQ();
+            for (String subjectArea : subjects) {
+                ctx.log("Updating courses for [" + subjectArea + " " + quarterYYYYQ + "]");
 
-                    List<ConvertedSection> convertedSections = ucsbCurriculumService.getConvertedSections(subjectArea, quarterYYYYQ,
-                            "A");
+                List<ConvertedSection> convertedSections = ucsbCurriculumService.getConvertedSections(subjectArea, quarterYYYYQ,
+                        "A");
 
-                    ctx.log("Found " + convertedSections.size() + " sections");
-                    ctx.log("Storing in MongoDB Collection...");
+                ctx.log("Found " + convertedSections.size() + " sections");
+                ctx.log("Storing in MongoDB Collection...");
 
-                    int newSections = 0;
-                    int updatedSections = 0;
-                    int errors = 0;
+                int newSections = 0;
+                int updatedSections = 0;
+                int errors = 0;
 
-                    for (ConvertedSection section : convertedSections) {
-                        try {
-                            String quarter = section.getCourseInfo().getQuarter();
-                            String enrollCode =  section.getSection().getEnrollCode();
-                            Optional<ConvertedSection> optionalSection = convertedSectionCollection
-                                    .findOneByQuarterAndEnrollCode(quarter,enrollCode);
-                            if (optionalSection.isPresent()) {
-                                ConvertedSection existingSection = optionalSection.get();
-                                existingSection.setCourseInfo(section.getCourseInfo());
-                                existingSection.setSection(section.getSection());
-                                convertedSectionCollection.save(existingSection);
-                                updatedSections++;
-                            } else {
-                                convertedSectionCollection.save(section);
-                                newSections++;
-                            }
-                        } catch (Exception e) {
-                            ctx.log("Error saving section: " + e.getMessage());
-                            errors++;
+                for (ConvertedSection section : convertedSections) {
+                    try {
+                        String qtr = section.getCourseInfo().getQuarter();
+                        String enrollCode =  section.getSection().getEnrollCode();
+                        Optional<ConvertedSection> optionalSection = convertedSectionCollection
+                                .findOneByQuarterAndEnrollCode(qtr,enrollCode);
+                        if (optionalSection.isPresent()) {
+                            ConvertedSection existingSection = optionalSection.get();
+                            existingSection.setCourseInfo(section.getCourseInfo());
+                            existingSection.setSection(section.getSection());
+                            convertedSectionCollection.save(existingSection);
+                            updatedSections++;
+                        } else {
+                            convertedSectionCollection.save(section);
+                            newSections++;
                         }
+                    } catch (Exception e) {
+                        ctx.log("Error saving section: " + e.getMessage());
+                        errors++;
                     }
-                
-                    ctx.log(String.format("%d new sections saved, %d sections updated, %d errors", newSections, updatedSections,
-                            errors));
-                    ctx.log("Courses for [" + subjectArea + " " + quarterYYYYQ + "] have been updated");
-
-                    //break;
                 }
+            
+                ctx.log(String.format("%d new sections saved, %d sections updated, %d errors", newSections, updatedSections,
+                        errors));
+                ctx.log("Courses for [" + subjectArea + " " + quarterYYYYQ + "] have been updated");
 
-                if(c_year == end_year && c_qtr == end_qtr){
-                    return;
-                }
-
-
-                if(c_qtr == 4){
-                    current_qtr = 1;
-                }
             }
         }
     }
