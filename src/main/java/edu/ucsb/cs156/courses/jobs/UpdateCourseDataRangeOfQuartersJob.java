@@ -27,34 +27,6 @@ public class UpdateCourseDataRangeOfQuartersJob implements JobContextConsumer {
 
     @Override
     public void accept(JobContext ctx) throws Exception {
-
-/*
-        int year1 = Integer.parseInt(start_quarterYYYYQ.substring(0,4));
-        int qtr1 = Integer.parseInt(start_quarterYYYYQ.substring(4));
-
-
-        int year2 = Integer.parseInt(end_quarterYYYYQ.substring(0,4));
-        int qtr2 = Integer.parseInt(end_quarterYYYYQ.substring(4));
-
-        int current_year = year1;
-        int current_qtr = qtr1;
-
-        int end_year = year2;
-        int end_qtr = qtr2;
-    
-        //case 1
-        if(year1 > year2){
-            return;
-        }
-
-        //case 2
-        if(year1 == year2) {
-
-            if(qtr1 > qtr2) {
-                return;
-            }
-        }
-    */
         List<Quarter> quarters = Quarter.quarterList(Quarter.yyyyqToQyy(Integer.parseInt(start_quarterYYYYQ)), Quarter.yyyyqToQyy(Integer.parseInt(end_quarterYYYYQ)));
         for(Quarter quarter : quarters) {
             String quarterYYYYQ = quarter.getYYYYQ();
