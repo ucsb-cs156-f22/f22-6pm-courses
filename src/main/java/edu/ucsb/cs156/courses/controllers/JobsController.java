@@ -21,6 +21,8 @@ import edu.ucsb.cs156.courses.collections.ConvertedSectionCollection;
 import edu.ucsb.cs156.courses.entities.Job;
 import edu.ucsb.cs156.courses.jobs.UpdateCourseDataJob;
 import edu.ucsb.cs156.courses.jobs.UpdateCourseDataJobFactory;
+import edu.ucsb.cs156.courses.jobs.UpdateCourseDataRangeOfQuartersJob;
+import edu.ucsb.cs156.courses.jobs.UpdateCourseDataRangeOfQuartersJobFactory;
 import edu.ucsb.cs156.courses.jobs.UpdateCourseDataOneQuarterJob;
 import edu.ucsb.cs156.courses.jobs.UpdateCourseDataOneQuarterJobFactory;
 import edu.ucsb.cs156.courses.jobs.TestJob;
@@ -46,6 +48,9 @@ public class JobsController extends ApiController {
 
     @Autowired
     UpdateCourseDataJobFactory updateCourseDataJobFactory;
+
+    @Autowired
+    UpdateCourseDataRangeOfQuartersJobFactory updateCourseDataRangeOfQuartersJobFactory;
 
     @Autowired
     UpdateCourseDataOneQuarterJobFactory updateCourseDataOneQuarterJobFactory;
@@ -86,6 +91,20 @@ public class JobsController extends ApiController {
             quarterYYYYQ);
 
         return jobService.runAsJob(updateCourseDataJob);
+    }
+
+    @ApiOperation(value = "Launch Job to Update Course Data for range of quarters")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @PostMapping("/launch/updateCoursesRangeOfQuarters")
+    public Job launchUpdateCourseDataRangeOfQuartersJob(
+        @ApiParam("quarter (YYYYQ format)") @RequestParam String start_quarterYYYYQ,
+        @ApiParam("quarter (YYYYQ format)") @RequestParam String end_quarterYYYYQ
+    ) {
+       
+        UpdateCourseDataRangeOfQuartersJob updateCourseDataRangeOfQuartersJob = updateCourseDataRangeOfQuartersJobFactory.create(
+            start_quarterYYYYQ, end_quarterYYYYQ);
+
+        return jobService.runAsJob(updateCourseDataRangeOfQuartersJob);
     }
 
     @ApiOperation(value = "Launch Job to Update Course Data for one quarter")
