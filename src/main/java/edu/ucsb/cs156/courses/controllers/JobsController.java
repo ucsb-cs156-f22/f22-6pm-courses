@@ -7,7 +7,6 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Import;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -23,6 +22,8 @@ import edu.ucsb.cs156.courses.jobs.UpdateCourseDataJob;
 import edu.ucsb.cs156.courses.jobs.UpdateCourseDataJobFactory;
 import edu.ucsb.cs156.courses.jobs.UpdateCourseDataRangeOfQuartersJob;
 import edu.ucsb.cs156.courses.jobs.UpdateCourseDataRangeOfQuartersJobFactory;
+import edu.ucsb.cs156.courses.jobs.UpdateCourseDataRangeOfQuartersSingleSubjectJob;
+import edu.ucsb.cs156.courses.jobs.UpdateCourseDataRangeOfQuartersSingleSubjectJobFactory;
 import edu.ucsb.cs156.courses.jobs.UpdateCourseDataOneQuarterJob;
 import edu.ucsb.cs156.courses.jobs.UpdateCourseDataOneQuarterJobFactory;
 import edu.ucsb.cs156.courses.jobs.TestJob;
@@ -54,6 +55,9 @@ public class JobsController extends ApiController {
 
     @Autowired
     UpdateCourseDataOneQuarterJobFactory updateCourseDataOneQuarterJobFactory;
+
+    @Autowired
+    UpdateCourseDataRangeOfQuartersSingleSubjectJobFactory updateCourseDataRangeOfQuartersSingleSubjectJobFactory;
 
     @ApiOperation(value = "List all jobs")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
@@ -105,6 +109,22 @@ public class JobsController extends ApiController {
             start_quarterYYYYQ, end_quarterYYYYQ);
 
         return jobService.runAsJob(updateCourseDataRangeOfQuartersJob);
+    }
+
+    @ApiOperation(value = "Launch Job to Update Course Data for a range of quarters for a single subject")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @PostMapping("/launch/updateCoursesRangeOfQuartersSingleSubject")
+    public Job launchUpdateCourseDataRangeOfQuartersSingleSubjectJob(
+        @ApiParam("subject area") @RequestParam String subjectArea,
+        @ApiParam("quarter (YYYYQ format)") @RequestParam String start_quarterYYYYQ,
+        @ApiParam("quarter (YYYYQ format)") @RequestParam String end_quarterYYYYQ
+    ) {
+       
+        UpdateCourseDataRangeOfQuartersSingleSubjectJob updateCourseDataRangeOfQuartersSingleSubjectJob = 
+        updateCourseDataRangeOfQuartersSingleSubjectJobFactory.create(
+            subjectArea, start_quarterYYYYQ, end_quarterYYYYQ);
+
+        return jobService.runAsJob(updateCourseDataRangeOfQuartersSingleSubjectJob);
     }
 
     @ApiOperation(value = "Launch Job to Update Course Data for one quarter")
